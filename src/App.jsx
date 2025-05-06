@@ -1,129 +1,101 @@
-import React, { useState, useEffect, useRef } from 'react';
-import { Button } from '@/components/ui/button';
-import { Slider } from '@/components/ui/slider';
-import { Checkbox } from '@/components/ui/checkbox';
-import { Label } from '@/components/ui/label';
-import { Input } from '@/components/ui/input';
-import { Card, CardContent } from '@/components/ui/card';
-import { RotateCcw, PlayCircle, Mic } from 'lucide-react';
-import * as Tone from 'tone';
-import OpenSheetMusicDisplay from 'opensheetmusicdisplay';
+import React, { useState } from 'react';
+import axios from 'axios';
 
-export default function EtudePractice() {
-  const [settings, setSettings] = useState({
-    rhythm: true,
-    keys: ['C', 'Bb'],
-    jumps: true,
-    measures: 4,
-    transpose: 'C'
-  });
-  const [tempo, setTempo] = useState(100);
-  const [etude, setEtude] = useState(null);
-  const osmdRef = useRef(null);
-  const containerRef = useRef(null);
+const API_URL = "https://your-backend.onrender.com/generate"; // Replace with your Render URL
 
-  const fetchEtude = async () => {
-    const res = await fetch('http://localhost:5000/generate', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(settings),
-    });
-    const data = await res.json();
-    setEtude(data);
+const App = () => {
+  const [keys, setKeys] = useState([]);
+  const [rhythms, setRhythms] = useState(false);
+  const [intervals, setIntervals] = useState(false);
+  const [measures, setMeasures] = useState(4);
+  const [tempo, setTempo] = useState(120);
+  const [etude, setEtude] = useState([]);
+
+  const handleKeyChange = (key) => {
+    setKeys(prev => prev.includes(key) ? prev.filter(k => k !== key) : [...prev, key]);
   };
 
-  useEffect(() => {
-    if (etude) {
-      const osmd = new OpenSheetMusicDisplay(containerRef.current);
-      fetch(`http://localhost:5000${etude.musicxml}`)
-        .then(res => res.text())
-        .then(xml => {
-          osmd.load(xml).then(() => osmd.render());
-          osmdRef.current = osmd;
-        });
-    }
-  }, [etude]);
-
-  const playMidi = async () => {
-    await Tone.start();
-    const midiUrl = `http://localhost:5000${etude.midi}`;
-    const response = await fetch(midiUrl);
-    const arrayBuffer = await response.arrayBuffer();
-    const midi = await Tone.Midi.fromUrl(midiUrl);
-
-    const synth = new Tone.PolySynth(Tone.Synth).toDestination();
-    Tone.Transport.bpm.value = tempo;
-
-    midi.tracks.forEach(track => {
-      track.notes.forEach(note => {
-        Tone.Transport.schedule(time => {
-          synth.triggerAttackRelease(note.name, note.duration, time, note.velocity);
-        }, note.time);
+  const handleSubmit = async () => {
+    try {
+      const response = await axios.post(API_URL, {
+        keys,
+        rhythms,
+        intervals,
+        measures,
+        tempo
       });
-    });
-
-    Tone.Transport.start();
+      setEtude(response.data.etude);
+    } catch (error) {
+      console.error("Error generating etude:", error);
+    }
   };
 
   return (
-    <div className="p-6 space-y-4">
-      <Card>
-        <CardContent className="space-y-4 p-4">
-          <h2 className="text-xl font-bold">Main Menu</h2>
-          <div className="grid grid-cols-2 gap-4">
-            <div>
-              <Label>Keys</Label>
-              <Input
-                value={settings.keys.join(',')}
-                onChange={(e) => setSettings({ ...settings, keys: e.target.value.split(',') })}
-              />
-            </div>
-            <div className="flex items-center space-x-2">
-              <Checkbox
-                checked={settings.rhythm}
-                onCheckedChange={(val) => setSettings({ ...settings, rhythm: val })}
-              />
-              <Label>Include Rhythms</Label>
-            </div>
-            <div className="flex items-center space-x-2">
-              <Checkbox
-                checked={settings.jumps}
-                onCheckedChange={(val) => setSettings({ ...settings, jumps: val })}
-              />
-              <Label>Include Jumps</Label>
-            </div>
-            <div>
-              <Label>Measures: {settings.measures}</Label>
-              <Slider
-                min={2}
-                max={16}
-                value={[settings.measures]}
-                onValueChange={([val]) => setSettings({ ...settings, measures: val })}
-              />
-            </div>
-          </div>
-          <Button onClick={fetchEtude}>Generate Etude</Button>
-        </CardContent>
-      </Card>
+    <div style={{ padding: 20 }}>
+      <h1>TiNQuiLTS Sightreading</h1>
+      <h3>Select Keys</h3>
+      {['C', 'Db', 'D', 'Eb', 'E', 'F', 'Gb', 'G', 'Ab', 'A', 'Bb', 'B'].map(key => (
+        <label key={key} style={{ marginRight: 10 }}>
+          <input
+            type="checkbox"
+            checked={keys.includes(key)}
+            onChange={() => handleKeyChange(key)}
+          />
+          {key}
+        </label>
+      ))}
 
-      {etude && (
-        <div className="space-y-4">
-          <div className="flex items-center space-x-4">
-            <Label>Tempo: {tempo} BPM</Label>
-            <Slider min={40} max={200} value={[tempo]} onValueChange={([val]) => setTempo(val)} />
-            <Button onClick={playMidi}>
-              <PlayCircle className="mr-2" /> Play Correct
-            </Button>
-            <Button variant="secondary">
-              <Mic className="mr-2" /> Record + Playback
-            </Button>
-            <Button variant="ghost" onClick={fetchEtude}>
-              <RotateCcw className="mr-2" /> Next Etude
-            </Button>
-          </div>
-          <div ref={containerRef} className="bg-white rounded shadow p-4"></div>
+      <div style={{ marginTop: 20 }}>
+        <label>
+          <input
+            type="checkbox"
+            checked={rhythms}
+            onChange={() => setRhythms(!rhythms)}
+          /> Rhythms
+        </label>
+        <label style={{ marginLeft: 20 }}>
+          <input
+            type="checkbox"
+            checked={intervals}
+            onChange={() => setIntervals(!intervals)}
+          /> Intervals
+        </label>
+      </div>
+
+      <div style={{ marginTop: 20 }}>
+        <label>Measures: {measures}</label>
+        <input
+          type="range"
+          min="1"
+          max="16"
+          value={measures}
+          onChange={e => setMeasures(Number(e.target.value))}
+        />
+      </div>
+
+      <div style={{ marginTop: 20 }}>
+        <label>Tempo: {tempo} BPM</label>
+        <input
+          type="range"
+          min="40"
+          max="240"
+          value={tempo}
+          onChange={e => setTempo(Number(e.target.value))}
+        />
+      </div>
+
+      <button style={{ marginTop: 20 }} onClick={handleSubmit}>
+        Generate Etude
+      </button>
+
+      {etude.length > 0 && (
+        <div style={{ marginTop: 30 }}>
+          <h3>Generated Etude</h3>
+          <pre>{etude.map(([note, dur], i) => `${note} (${dur})`).join('\n')}</pre>
         </div>
       )}
     </div>
   );
-}
+};
+
+export default App;
