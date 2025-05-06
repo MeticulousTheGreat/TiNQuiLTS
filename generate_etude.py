@@ -1,108 +1,47 @@
-# Etude Practice Tool (Backend MVP)
-# Requires: music21, Flask, Flask-CORS
-
-from flask import Flask, request, jsonify, send_file
-from flask_cors import CORS
-from music21 import stream, note, meter, key, tempo, midi, scale
 import random
-import tempfile
-import os
 
-app = Flask(__name__)
-CORS(app)
+SCALE_NOTES = {
+    "C": ["C", "D", "E", "F", "G", "A", "B"],
+    "Bb": ["Bb", "C", "D", "Eb", "F", "G", "A"],
+    "Ab": ["Ab", "Bb", "C", "Db", "Eb", "F", "G"]
+}
 
-# ------------------------
-# Helper Functions
-# ------------------------
+RHYTHMS = {
+    "quarter": 1.0,
+    "eighth": 0.5,
+    "half": 2.0
+}
 
-def generate_etude(settings):
-    num_measures = settings.get('measures', 4)
-    selected_keys = settings.get('keys', [])  # e.g., ['C', 'Bb']
-    include_rhythm = settings.get('rhythm', False)
-    include_jumps = settings.get('jumps', False)
-    transposition = settings.get('transpose', 'C')  # Default concert C
+def generate_etude(selected_keys, selected_rhythms, use_intervals, num_measures, beats_per_measure=4):
+    key = random.choice(selected_keys) if selected_keys else "C"
+    scale = SCALE_NOTES.get(key, SCALE_NOTES["C"])
+    rhythm_values = [RHYTHMS[r] for r in selected_rhythms] if selected_rhythms else [1.0]
 
-    # Choose random key if provided
-    chosen_key_str = random.choice(selected_keys) if selected_keys else 'C'
-    chosen_key = key.Key(chosen_key_str)
+    etude = []
+    current_note = random.choice(scale)
+    remaining_beats = num_measures * beats_per_measure
 
-    # Create scale object for note generation
-    scale_obj = scale.MajorScale(chosen_key.tonic.name)
+    while remaining_beats > 0:
+        duration = random.choice(rhythm_values)
+        if duration > remaining_beats:
+            duration = remaining_beats
 
-    s = stream.Stream()
-    s.append(tempo.MetronomeMark(number=100))
-    s.append(meter.TimeSignature('4/4'))
-    s.append(chosen_key)
+        etude.append((current_note, duration))
+        remaining_beats -= duration
 
-    notes_per_measure = 4 if not include_rhythm else 8  # If rhythm = True, use more flexible rhythm patterns
-    total_notes = num_measures * notes_per_measure
+        if selected_rhythms and not selected_keys:
+            continue
 
-    prev_idx = random.randint(0, 6)  # Start at a random degree in scale
-    current_pitch = scale_obj.getPitches("C3", "C6")[prev_idx]
-
-    for _ in range(total_notes):
-        dur = 1.0  # default quarter note
-
-        if include_rhythm:
-            dur = random.choice([0.5, 1.0, 1.5])  # 8th, quarter, dotted quarter
-
-        if selected_keys:
-            if include_jumps:
-                jump = random.choice([-3, -2, -1, 1, 2, 3])
-            else:
-                jump = random.choice([-1, 1])
-
-            prev_idx += jump
-            prev_idx = max(0, min(prev_idx, 6))
-            pitches = scale_obj.getPitches("C3", "C6")
-            current_pitch = pitches[prev_idx % len(pitches)]
+        if use_intervals:
+            step = random.choice([-2, -1, 1, 2])
         else:
-            current_pitch = 'C4'  # Rhythm only mode
+            step = random.choice([-1, 1])
 
-        n = note.Note(current_pitch)
-        n.duration.quarterLength = dur
-        s.append(n)
+        idx = scale.index(current_note)
+        next_idx = (idx + step) % len(scale)
+        current_note = scale[next_idx]
 
-    return s, chosen_key_str
-
-# ------------------------
-# Routes
-# ------------------------
-
-@app.route('/generate', methods=['POST'])
-def generate():
-    settings = request.json
-    etude, chosen_key = generate_etude(settings)
-
-    # Save MusicXML and MIDI
-    temp_dir = tempfile.mkdtemp()
-    xml_path = os.path.join(temp_dir, 'etude.xml')
-    midi_path = os.path.join(temp_dir, 'etude.mid')
-    etude.write('musicxml', fp=xml_path)
-    mf = midi.translate.music21ObjectToMidiFile(etude)
-    mf.open(midi_path, 'wb')
-    mf.write()
-    mf.close()
-
-    return jsonify({
-        'musicxml': '/get_file/xml',
-        'midi': '/get_file/midi',
-        'key': chosen_key
-    })
-
-@app.route('/get_file/<filetype>', methods=['GET'])
-def get_file(filetype):
-    temp_dir = tempfile.gettempdir()
-    if filetype == 'xml':
-        return send_file(os.path.join(temp_dir, 'etude.xml'))
-    elif filetype == 'midi':
-        return send_file(os.path.join(temp_dir, 'etude.mid'))
-    else:
-        return 'Invalid file type', 400
-
-# ------------------------
-# Run Server
-# ------------------------
-
-if __name__ == '__main__':
-    app.run(debug=True)
+    return {
+        "key": key,
+        "etude": etude
+    }
