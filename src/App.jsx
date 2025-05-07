@@ -34,7 +34,7 @@ const App = () => {
     <div style={{ padding: 20 }}>
       <h1>TiNQuiLTS Sightreading</h1>
       <h3>Select Keys</h3>
-      {['C', 'Db', 'D', 'Eb', 'E', 'F', 'Gb', 'G', 'Ab', 'A', 'Bb', 'B'].map(key => (
+      {['Gb', 'Db', 'Ab', 'Eb', 'Bb', 'F', 'C', 'G', 'D', 'A', "E', 'B', 'F#'].map(key => (
         <label key={key} style={{ marginRight: 10 }}>
           <input
             type="checkbox"
