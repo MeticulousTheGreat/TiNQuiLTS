@@ -39,43 +39,59 @@ class EtudeRequest(BaseModel):
 
 @app.post("/generate-etude")
 async def generate_etude(data: EtudeRequest):
+    selected_keys = config.get("selectedKeys", [])
+    selected_rhythms = config.get("selectedRhythms", False)
+    use_intervals = config.get("useIntervals", False)
+    num_measures = config.get("numMeasures", 4)
+    beats_per_measure = 4
+
+    total_beats = num_measures * beats_per_measure
     etude = []
-    keys = data.keys
-    rhythms = data.rhythms
-    use_intervals = data.intervals
-    total_notes = data.measures * 4  # Assuming 4/4 time (one note per beat for now)
 
-    # Rhythm-only etude: no key, no intervals
-    if not keys and rhythms and not use_intervals:
-        for _ in range(total_notes):
-            duration = random.choice(rhythms)
-            etude.append(("C4", duration))  # Fixed note for percussion display
-        return {"etude": etude}
+    if not selected_keys and selected_rhythms:
+        # Rhythm-only mode: use a percussion line
+        beats_remaining = total_beats
+        while beats_remaining > 0:
+            dur = random.choice(DURATIONS)
+            dur_val = {"q": 1, "8": 0.5, "16": 0.25}[dur]
+            if dur_val <= beats_remaining:
+                etude.append({"note": "x/0", "duration": dur})
+                beats_remaining -= dur_val
+        return etude
 
-    # Handle general case
-    if not keys:
-        keys = ["C"]
+    # Pick one key for this etude (if any); if none, default to C
+    key = random.choice(selected_keys) if selected_keys else "C"
+    scale = SCALE_NOTES.get(key, SCALE_NOTES["C"])
 
-    for _ in range(total_notes):
-        key = random.choice(keys)
-        scale = SCALE_NOTES.get(key, SCALE_NOTES["C"])
+    # Generate notes
+    beats_remaining = total_beats
+    prev_idx = random.randint(0, len(scale) - 1)
 
+    while beats_remaining > 0:
+        dur = "q"  # default duration
+        dur_val = 1.0
+
+        if selected_rhythms:
+            dur = random.choice(DURATIONS)
+            dur_val = {"q": 1, "8": 0.5, "16": 0.25}[dur]
+
+        if dur_val > beats_remaining:
+            continue  # skip this one and try a smaller duration
+
+        # Determine next note
         if use_intervals:
-            start_index = random.randint(0, len(scale) - 1)
-            jump_range = random.randint(1, min(7, len(scale)-1))  # up to octave
-            direction = random.choice([-1, 1])
-            target_index = (start_index + direction * jump_range) % len(scale)
-            note = scale[target_index]
+            # Jump anywhere from a second to an octave
+            jump = random.randint(-7, 7)
+            next_idx = (prev_idx + jump) % len(scale)
         else:
-            # Scalar run
-            if 'last_note_index' not in locals():
-                last_note_index = random.randint(0, len(scale) - 1)
-            direction = random.choice([-1, 1])
-            last_note_index = (last_note_index + direction) % len(scale)
-            note = scale[last_note_index]
+            # Stepwise motion (up/down one scale degree)
+            step = random.choice([-1, 1])
+            next_idx = (prev_idx + step) % len(scale)
 
-        octave = 4  # You could make this user-selectable later
-        duration = random.choice(rhythms) if rhythms else "q"
-        etude.append((f"{note}{octave}", duration))
+        note = scale[next_idx] + "4"  # All notes in octave 4 for simplicity
+        etude.append({"note": note, "duration": dur})
+        prev_idx = next_idx
+        beats_remaining -= dur_val
 
+    #return etude
     return {"etude": etude}
