@@ -8,15 +8,8 @@ CORS(app)
 
 @app.route("/generate", methods=["POST"])
 def generate():
-    data = request.json
-    selected_keys = data.get("keys", [])
-    selected_rhythms = data.get("rhythms", [])
-    use_intervals = data.get("intervals", False)
-    num_measures = data.get("measures", 4)
+    data = request.get_json()
+    print("Received data:", data)
 
-    etude = generate_etude(selected_keys, selected_rhythms, use_intervals, num_measures)
-    return jsonify(etude)
-
-if __name__ == "__main__":
-    port = int(os.environ.get("PORT", 10000))
-    app.run(host="0.0.0.0", port=port)
+    etude = generate_etude(data)  # Pass the whole config dict
+    return jsonify({"etude": etude})
