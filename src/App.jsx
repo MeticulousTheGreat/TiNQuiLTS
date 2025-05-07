@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import axios from 'axios';
+import EtudeNotation from "./components/EtudeNotation";
 
 const API_URL = "https://tinquilts-backend.onrender.com/generate";
 
