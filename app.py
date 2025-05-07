@@ -8,14 +8,13 @@ CORS(app)
 
 @app.route("/generate", methods=["POST"])
 def generate():
-    data = request.get_json()
-    print("Received config:", data)
-
     try:
-        etude = generate_etude(data)
+        config = request.get_json()
+        print("Received config:", config)
+        etude = generate_etude(config)
         return jsonify({"etude": etude})
     except Exception as e:
-        print("Error during etude generation:", str(e))
+        print("Error generating etude:", e)
         return jsonify({"error": str(e)}), 500
 
 if __name__ == "__main__":
