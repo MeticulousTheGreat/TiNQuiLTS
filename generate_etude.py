@@ -31,14 +31,10 @@ SCALE_NOTES = {
     "Chromatic": ["C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "B"]
 }
 
-class EtudeRequest(BaseModel):
-    keys: list[str]
-    rhythms: list[str]
-    intervals: bool
-    measures: int
+DURATIONS = ["q", "8", "16"]  # quarter, eighth, sixteenth
+DEFAULT_NOTE = "C4"
 
-@app.post("/generate-etude")
-async def generate_etude(data: EtudeRequest):
+def generate_etude(config):
     selected_keys = config.get("selectedKeys", [])
     selected_rhythms = config.get("selectedRhythms", False)
     use_intervals = config.get("useIntervals", False)
@@ -93,5 +89,4 @@ async def generate_etude(data: EtudeRequest):
         prev_idx = next_idx
         beats_remaining -= dur_val
 
-    #return etude
-    return {"etude": etude}
+    return etude
