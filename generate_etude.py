@@ -1,5 +1,19 @@
 import random
+from fastapi import FastAPI, Request
+from fastapi.middleware.cors import CORSMiddleware
+from pydantic import BaseModel
 
+app = FastAPI()
+
+# Allow CORS for frontend dev
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
+# Scale definitions
 SCALE_NOTES = {
     "C":  ["C", "D", "E", "F", "G", "A", "B"],
     "G":  ["G", "A", "B", "C", "D", "E", "F#"],
@@ -13,46 +27,55 @@ SCALE_NOTES = {
     "Ab": ["Ab", "Bb", "C", "Db", "Eb", "F", "G"],
     "Eb": ["Eb", "F", "G", "Ab", "Bb", "C", "D"],
     "Bb": ["Bb", "C", "D", "Eb", "F", "G", "A"],
-    "F":  ["F", "G", "A", "Bb", "C", "D", "E"]
+    "F":  ["F", "G", "A", "Bb", "C", "D", "E"],
+    "Chromatic": ["C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "B"]
 }
 
+class EtudeRequest(BaseModel):
+    keys: list[str]
+    rhythms: list[str]
+    intervals: bool
+    measures: int
 
-RHYTHMS = {
-    "quarter": 1.0,
-    "eighth": 0.5,
-    "half": 2.0
-}
-
-def generate_etude(selected_keys, selected_rhythms, use_intervals, num_measures, beats_per_measure=4):
-    key = random.choice(selected_keys) if selected_keys else "C"
-    scale = SCALE_NOTES.get(key, SCALE_NOTES["C"])
-    rhythm_values = [RHYTHMS[r] for r in selected_rhythms] if selected_rhythms else [1.0]
-
+@app.post("/generate-etude")
+async def generate_etude(data: EtudeRequest):
     etude = []
-    current_note = random.choice(scale)
-    remaining_beats = num_measures * beats_per_measure
+    keys = data.keys
+    rhythms = data.rhythms
+    use_intervals = data.intervals
+    total_notes = data.measures * 4  # Assuming 4/4 time (one note per beat for now)
 
-    while remaining_beats > 0:
-        duration = random.choice(rhythm_values)
-        if duration > remaining_beats:
-            duration = remaining_beats
+    # Rhythm-only etude: no key, no intervals
+    if not keys and rhythms and not use_intervals:
+        for _ in range(total_notes):
+            duration = random.choice(rhythms)
+            etude.append(("C4", duration))  # Fixed note for percussion display
+        return {"etude": etude}
 
-        etude.append((current_note, duration))
-        remaining_beats -= duration
+    # Handle general case
+    if not keys:
+        keys = ["C"]
 
-        if selected_rhythms and not selected_keys:
-            continue
+    for _ in range(total_notes):
+        key = random.choice(keys)
+        scale = SCALE_NOTES.get(key, SCALE_NOTES["C"])
 
         if use_intervals:
-            step = random.choice([-2, -1, 1, 2])
+            start_index = random.randint(0, len(scale) - 1)
+            jump_range = random.randint(1, min(7, len(scale)-1))  # up to octave
+            direction = random.choice([-1, 1])
+            target_index = (start_index + direction * jump_range) % len(scale)
+            note = scale[target_index]
         else:
-            step = random.choice([-1, 1])
+            # Scalar run
+            if 'last_note_index' not in locals():
+                last_note_index = random.randint(0, len(scale) - 1)
+            direction = random.choice([-1, 1])
+            last_note_index = (last_note_index + direction) % len(scale)
+            note = scale[last_note_index]
 
-        idx = scale.index(current_note)
-        next_idx = (idx + step) % len(scale)
-        current_note = scale[next_idx]
+        octave = 4  # You could make this user-selectable later
+        duration = random.choice(rhythms) if rhythms else "q"
+        etude.append((f"{note}{octave}", duration))
 
-    return {
-        "key": key,
-        "etude": etude
-    }
+    return {"etude": etude}
