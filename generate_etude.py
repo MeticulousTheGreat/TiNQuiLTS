@@ -1,19 +1,6 @@
 import random
-from fastapi import FastAPI, Request
-from fastapi.middleware.cors import CORSMiddleware
-from pydantic import BaseModel
 
-app = FastAPI()
-
-# Allow CORS for frontend dev
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=["*"],
-    allow_methods=["*"],
-    allow_headers=["*"],
-)
-
-# Scale definitions
+# Define scale notes for 12 major keys + Chromatic
 SCALE_NOTES = {
     "C":  ["C", "D", "E", "F", "G", "A", "B"],
     "G":  ["G", "A", "B", "C", "D", "E", "F#"],
@@ -32,7 +19,6 @@ SCALE_NOTES = {
 }
 
 DURATIONS = ["q", "8", "16"]  # quarter, eighth, sixteenth
-DEFAULT_NOTE = "C4"
 
 def generate_etude(config):
     selected_keys = config.get("selectedKeys", [])
@@ -45,7 +31,7 @@ def generate_etude(config):
     etude = []
 
     if not selected_keys and selected_rhythms:
-        # Rhythm-only mode: use a percussion line
+        # Rhythm-only etude: use percussion notation
         beats_remaining = total_beats
         while beats_remaining > 0:
             dur = random.choice(DURATIONS)
@@ -55,16 +41,16 @@ def generate_etude(config):
                 beats_remaining -= dur_val
         return etude
 
-    # Pick one key for this etude (if any); if none, default to C
+    # Select a key or default to C
     key = random.choice(selected_keys) if selected_keys else "C"
     scale = SCALE_NOTES.get(key, SCALE_NOTES["C"])
 
-    # Generate notes
-    beats_remaining = total_beats
+    # Start from a random note in the scale
     prev_idx = random.randint(0, len(scale) - 1)
+    beats_remaining = total_beats
 
     while beats_remaining > 0:
-        dur = "q"  # default duration
+        dur = "q"
         dur_val = 1.0
 
         if selected_rhythms:
@@ -72,19 +58,16 @@ def generate_etude(config):
             dur_val = {"q": 1, "8": 0.5, "16": 0.25}[dur]
 
         if dur_val > beats_remaining:
-            continue  # skip this one and try a smaller duration
+            continue  # skip this duration if too long for remaining time
 
-        # Determine next note
         if use_intervals:
-            # Jump anywhere from a second to an octave
-            jump = random.randint(-7, 7)
+            jump = random.randint(-7, 7)  # Up to an octave
             next_idx = (prev_idx + jump) % len(scale)
         else:
-            # Stepwise motion (up/down one scale degree)
             step = random.choice([-1, 1])
             next_idx = (prev_idx + step) % len(scale)
 
-        note = scale[next_idx] + "4"  # All notes in octave 4 for simplicity
+        note = scale[next_idx] + "4"  # use octave 4
         etude.append({"note": note, "duration": dur})
         prev_idx = next_idx
         beats_remaining -= dur_val
