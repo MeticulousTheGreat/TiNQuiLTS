@@ -35,7 +35,7 @@ const App = () => {
       <h1>TiNQuiLTS Sightreading</h1>
       <h3>Select Keys</h3>
       {['Gb', 'Db', 'Ab', 'Eb', 'Bb', 'F', 'C', 'G', 'D', 'A', 'E', 'B', 'F#'].map(key => (
-        <label key={key} style={{ fontWeight: key === "C" ? "bold" : "normal" }{ marginRight: 10 }}>
+        <label key={key} style={{ fontWeight: key === "C" ? "bold" : "normal" }}>
           <input
             type="checkbox"
             checked={keys.includes(key)}
