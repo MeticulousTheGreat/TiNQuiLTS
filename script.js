@@ -30,26 +30,29 @@ document.getElementById("generateBtn").addEventListener("click", async () => {
     const data = await res.json();
     const etude = data.etude;
 
-    const notationDiv = document.getElementById("output");
-    notationDiv.innerHTML = ""; // Clear previous notation
+    const output = document.getElementById("output");
+    output.innerHTML = ""; // Clear old content
 
     const VF = Vex.Flow;
-    const renderer = new VF.Renderer(notationDiv, VF.Renderer.Backends.SVG);
+    const renderer = new VF.Renderer(output, VF.Renderer.Backends.SVG);
     renderer.resize(700, 200);
     const context = renderer.getContext();
 
-// Use percussion clef if no key selected
-    const usePercussion = selectedKeys.length === 0;
-
     const stave = new VF.Stave(10, 40, 680);
-    stave.addClef(usePercussion ? "percussion" : "treble");
+    stave.addClef("treble");
+
+    // Add key signature if available
+    if (selectedKeys.length > 0) {
+      stave.addKeySignature(selectedKeys[0]);
+    }
+
     stave.setContext(context).draw();
 
     const vexNotes = etude.map(({ note, duration }) => {
-      const vfNote = usePercussion ? "c/5" : note.replace(/(\d)/, "/$1");
+      const key = note.replace(/(\d)/, "/$1"); // e.g., "C4" → "c/4"
       return new VF.StaveNote({
-        clef: usePercussion ? "percussion" : "treble",
-        keys: [vfNote],
+        clef: "treble",
+        keys: [key],
         duration: duration
       });
     });
@@ -58,13 +61,10 @@ document.getElementById("generateBtn").addEventListener("click", async () => {
       num_beats: etude.length,
       beat_value: 4
     });
-    voice.addTickables(vexNotes);
 
+    voice.addTickables(vexNotes);
     new VF.Formatter().joinVoices([voice]).format([voice], 600);
     voice.draw(context, stave);
-
-// OLD:
-// document.getElementById("output").textContent = data.etude.join(" ");
 
   } catch (err) {
     document.getElementById("output").textContent = `Error: ${err.message}`;
