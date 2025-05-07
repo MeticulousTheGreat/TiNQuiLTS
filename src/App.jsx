@@ -90,11 +90,9 @@ const App = () => {
       </button>
 
       {etude.length > 0 && (
-        <div style={{ marginTop: 30 }}>
-          <h3>Generated Etude</h3>
-          <pre>{etude.map(([note, dur], i) => `${note} (${dur})`).join('\n')}</pre>
-        </div>
+        <EtudeNotation etude={etude} showRhythmOnly={selectedKeys.length === 0} />
       )}
+
     </div>
   );
 };
