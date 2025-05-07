@@ -1,0 +1,15 @@
+body {
+  font-family: Arial, sans-serif;
+  padding: 20px;
+}
+
+input[type="range"] {
+  width: 300px;
+}
+
+#output {
+  background: #f4f4f4;
+  padding: 10px;
+  white-space: pre-wrap;
+  border: 1px solid #ccc;
+}
