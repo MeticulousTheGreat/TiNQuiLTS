@@ -6,16 +6,9 @@ import os
 app = Flask(__name__)
 CORS(app)
 
-@app.route("/generate", methods=["POST"])
-def generate():
-    try:
-        config = request.get_json()
-        print("Received config:", config)
-        etude = generate_etude(config)
-        return jsonify({"etude": etude})
-    except Exception as e:
-        print("Error generating etude:", e)
-        return jsonify({"error": str(e)}), 500
+@app.route('/')
+def index():
+    return send_from_directory('static', 'index.html')
 
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 10000))
