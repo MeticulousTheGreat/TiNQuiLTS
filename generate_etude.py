@@ -18,58 +18,61 @@ SCALE_NOTES = {
     "Chromatic": ["C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "B"]
 }
 
-DURATIONS = ["q", "8", "16"]  # quarter, eighth, sixteenth
+# Supported rhythm durations and their beat values
+DURATION_VALUES = {
+    "q": 1.0,
+    "8": 0.5,
+    "16": 0.25
+}
+DURATIONS = list(DURATION_VALUES.keys())
 
 def generate_etude(config):
-    selected_keys = config.get("selectedKeys", [])
-    selected_rhythms = config.get("selectedRhythms", False)
-    use_intervals = config.get("useIntervals", False)
-    num_measures = config.get("numMeasures", 4)
-    beats_per_measure = 4
+    # Extract parameters from the frontend
+    selected_keys = config.get("selected_keys", [])
+    selected_rhythms = config.get("selected_rhythms", False)
+    use_intervals = config.get("use_intervals", False)
+    num_measures = config.get("num_measures", 4)
 
+    beats_per_measure = 4
     total_beats = num_measures * beats_per_measure
+
     etude = []
 
-    if not selected_keys and selected_rhythms:
-        # Rhythm-only etude: use percussion notation
-        beats_remaining = total_beats
-        while beats_remaining > 0:
-            dur = random.choice(DURATIONS)
-            dur_val = {"q": 1, "8": 0.5, "16": 0.25}[dur]
-            if dur_val <= beats_remaining:
-                etude.append({"note": "x/0", "duration": dur})
-                beats_remaining -= dur_val
-        return etude
-
-    # Select a key or default to C
+    # Default to C if no key is selected
     key = random.choice(selected_keys) if selected_keys else "C"
     scale = SCALE_NOTES.get(key, SCALE_NOTES["C"])
 
-    # Start from a random note in the scale
-    prev_idx = random.randint(0, len(scale) - 1)
+    # Start from a random note index
+    current_index = random.randint(0, len(scale) - 1)
     beats_remaining = total_beats
 
     while beats_remaining > 0:
-        dur = "q"
-        dur_val = 1.0
-
+        # Select a rhythm duration
         if selected_rhythms:
-            dur = random.choice(DURATIONS)
-            dur_val = {"q": 1, "8": 0.5, "16": 0.25}[dur]
-
-        if dur_val > beats_remaining:
-            continue  # skip this duration if too long for remaining time
-
-        if use_intervals:
-            jump = random.randint(-7, 7)  # Up to an octave
-            next_idx = (prev_idx + jump) % len(scale)
+            duration = random.choice(DURATIONS)
+            dur_value = DURATION_VALUES[duration]
         else:
-            step = random.choice([-1, 1])
-            next_idx = (prev_idx + step) % len(scale)
+            duration = "q"
+            dur_value = 1.0
 
-        note = scale[next_idx] + "4"  # use octave 4
-        etude.append({"note": note, "duration": dur})
-        prev_idx = next_idx
-        beats_remaining -= dur_val
+        if dur_value > beats_remaining:
+            continue  # try smaller durations next loop
+
+        # Determine next note index
+        if use_intervals:
+            jump = random.randint(-7, 7)  # interval up to an octave
+        else:
+            jump = random.choice([-1, 1])  # stepwise
+
+        current_index = (current_index + jump) % len(scale)
+        note_name = scale[current_index] + "4"  # octave fixed for now
+
+        # Append note and duration
+        etude.append({
+            "note": note_name,
+            "duration": duration
+        })
+
+        beats_remaining -= dur_value
 
     return etude
