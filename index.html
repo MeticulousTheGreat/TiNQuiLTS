@@ -1,11 +1,38 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <title>TiNQuiLTS</title>
-  </head>
-  <body>
-    <div id="root"></div>
-    <script type="module" src="/src/main.jsx"></script>
-  </body>
+<head>
+  <meta charset="UTF-8">
+  <title>TiNQuiLTS</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <h1>TiNQuiLTS Sightreading Generator</h1>
+
+  <label><strong>Keys:</strong></label>
+  <div id="keySelection">
+    <!-- Keys will be added dynamically -->
+  </div>
+
+  <label>
+    <input type="checkbox" id="useRhythms"> Include Rhythms
+  </label>
+  <label>
+    <input type="checkbox" id="useIntervals"> Include Intervals
+  </label>
+
+  <label for="tempo"><strong>Tempo:</strong></label>
+  <input type="range" id="tempo" min="40" max="200" value="100">
+  <span id="tempoValue">100</span> bpm
+
+  <label for="measures"><strong>Measures:</strong></label>
+  <input type="range" id="measures" min="1" max="16" value="4">
+  <span id="measureValue">4</span> measures
+
+  <br><br>
+  <button id="generateBtn">Generate Etude</button>
+
+  <div id="notation"></div>
+
+  <script src="script.js"></script>
+</body>
 </html>
