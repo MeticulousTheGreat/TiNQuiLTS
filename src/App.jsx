@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 //import axios from 'axios';
 
-const API_URL = "https://tinquilts-backend.onrender.com";
+const API_URL = "https://tinquilts-backend.onrender.com/generate";
 
 const App = () => {
   const [keys, setKeys] = useState([]);
