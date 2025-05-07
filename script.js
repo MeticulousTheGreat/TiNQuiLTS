@@ -14,7 +14,7 @@ document.getElementById("generateBtn").addEventListener("click", async () => {
   const numMeasures = parseInt(document.getElementById("numMeasures").value);
 
   try {
-    const res = await fetch("/generate", {
+    const res = await fetch("https://tinquilts-backend.onrender.com/generate", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
