@@ -1,37 +1,51 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>TiNQuiLTS</title>
-  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="style.css" />
 </head>
 <body>
-  <h1>TiNQuiLTS Sightreading Generator</h1>
+  <h1>TiNQuiLTS Etude Generator</h1>
 
-  <label><strong>Keys:</strong></label>
-  <div id="keySelection">
-    <!-- Keys will be added dynamically -->
+  <div>
+    <label><strong>Keys:</strong></label><br/>
+    <label><input type="checkbox" name="keys" value="C" /> C</label>
+    <label><input type="checkbox" name="keys" value="G" /> G</label>
+    <label><input type="checkbox" name="keys" value="D" /> D</label>
+    <label><input type="checkbox" name="keys" value="A" /> A</label>
+    <label><input type="checkbox" name="keys" value="E" /> E</label>
+    <label><input type="checkbox" name="keys" value="B" /> B</label>
+    <label><input type="checkbox" name="keys" value="F#" /> F#</label>
+    <label><input type="checkbox" name="keys" value="Db" /> Db</label>
+    <label><input type="checkbox" name="keys" value="Ab" /> Ab</label>
+    <label><input type="checkbox" name="keys" value="Eb" /> Eb</label>
+    <label><input type="checkbox" name="keys" value="Bb" /> Bb</label>
+    <label><input type="checkbox" name="keys" value="F" /> F</label>
+    <label><input type="checkbox" name="keys" value="Chromatic" /> Chromatic</label>
   </div>
 
-  <label>
-    <input type="checkbox" id="useRhythms"> Include Rhythms
-  </label>
-  <label>
-    <input type="checkbox" id="useIntervals"> Include Intervals
-  </label>
+  <div>
+    <label><input type="checkbox" id="useRhythms" /> Use Rhythms</label>
+    <label><input type="checkbox" id="useIntervals" /> Use Intervals</label>
+  </div>
 
-  <label for="tempo"><strong>Tempo:</strong></label>
-  <input type="range" id="tempo" min="40" max="200" value="100">
-  <span id="tempoValue">100</span> bpm
+  <div>
+    <label>Number of Measures:</label>
+    <input type="range" id="numMeasures" min="1" max="32" value="4" />
+    <span id="measureValue">4</span>
+  </div>
 
-  <label for="measures"><strong>Measures:</strong></label>
-  <input type="range" id="measures" min="1" max="16" value="4">
-  <span id="measureValue">4</span> measures
+  <div>
+    <label>Tempo: <span id="tempoValue">120</span> bpm</label><br/>
+    <input type="range" id="tempo" min="40" max="200" value="120"/>
+  </div>
 
-  <br><br>
   <button id="generateBtn">Generate Etude</button>
 
-  <div id="notation"></div>
+  <h2>Etude Output</h2>
+  <pre id="output"></pre>
 
   <script src="script.js"></script>
 </body>
