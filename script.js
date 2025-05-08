@@ -54,6 +54,7 @@ document.getElementById("generateBtn").addEventListener("click", async () => {
     const measures = [];
     let measureNotes = [];
     let currentBeats = 0;
+    let beatsPerMeasure=4
 
     const pushMeasure = () => {
       let remaining = beatsPerMeasure - currentBeats;
