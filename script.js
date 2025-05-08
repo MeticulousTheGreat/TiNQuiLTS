@@ -49,6 +49,7 @@ document.getElementById("generateBtn").addEventListener("click", async () => {
     });
 
     const score = factory.EasyScore();
+    const system = factory.System();
     const voices = [];
     const measures = [];
     let measureNotes = [];
@@ -103,7 +104,9 @@ document.getElementById("generateBtn").addEventListener("click", async () => {
       measures.push(measureNotes.join(" "));
     }
 
-    const system = factory.System();
+
+    
+    //draw staves with easy score
     for (let i = 0; i < measures.length; i++) {
       const stave = system.addStave({
         voices: [score.voice(score.notes(measures[i]))]
