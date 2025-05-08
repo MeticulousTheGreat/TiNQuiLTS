@@ -1,6 +1,5 @@
 import random
 
-# Scale definitions
 SCALE_NOTES = {
     "C":  ["C", "D", "E", "F", "G", "A", "B"],
     "G":  ["G", "A", "B", "C", "D", "E", "F#"],
@@ -17,11 +16,9 @@ SCALE_NOTES = {
     "Chromatic": ["C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "B"]
 }
 
-# Rhythm durations and values
 DURATION_VALUES = { "q": 1.0, "8": 0.5, "16": 0.25 }
 DURATIONS = list(DURATION_VALUES.keys())
 
-# NEW: MIDI conversion helpers for octave range logic
 NOTE_TO_MIDI = {
     "C": 0, "C#": 1, "Db": 1, "D": 2, "D#": 3, "Eb": 3,
     "E": 4, "F": 5, "F#": 6, "Gb": 6, "G": 7, "G#": 8,
@@ -39,13 +36,12 @@ def midi_to_note(midi_num):
             return f"{name}{octave}"
     return "C4"
 
-# Core generator
 def generate_etude(config):
     selected_keys = config.get("selected_keys", [])
     selected_rhythms = config.get("selected_rhythms", False)
     use_intervals = config.get("use_intervals", False)
     num_measures = config.get("num_measures", 4)
-    octave_range = config.get("octave_range", 2)  # NEW: default to 2 octave range
+    octave_range = config.get("octave_range", 2)
     center_midi = 69  # A4
 
     beats_per_measure = 4
@@ -73,7 +69,6 @@ def generate_etude(config):
         next_index = (index + jump) % len(scale)
         note_name = scale[next_index]
 
-        # NEW: Handle octave clamping
         target_midi = note_to_midi(note_name, current_octave)
         min_midi = center_midi - (6 * octave_range)
         max_midi = center_midi + (6 * octave_range)
