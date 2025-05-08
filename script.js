@@ -39,7 +39,7 @@ document.getElementById("generateBtn").addEventListener("click", async () => {
     const output = document.getElementById("output");
     output.innerHTML = "";
 
-    const VF = Vexflow;
+    const VF = Vex.Flow;
     const renderer = new VF.Renderer(output, VF.Renderer.Backends.SVG);
     renderer.resize(1000, 150 + numMeasures * 40);
     const context = renderer.getContext();
