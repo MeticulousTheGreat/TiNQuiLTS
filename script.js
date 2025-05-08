@@ -50,59 +50,49 @@ document.getElementById("generateBtn").addEventListener("click", async () => {
 
     const score = factory.EasyScore();
     const system = factory.System();
-    const voices = [];
+  //  const voices = [];
     const measures = [];
     let measureNotes = [];
-
     let currentBeats = 0;
-    const beatsPerMeasure = 4;
 
-    // Group notes into measures based on rhythm durations
+    const pushMeasure = () => {
+      let remaining = beatsPerMeasure - currentBeats;
+      while (remaining > 0) {
+        if (remaining >= 1) {
+          measureNotes.push("b4/q");
+          remaining -= 1;
+        } else if (remaining >= 0.5) {
+          measureNotes.push("b4/8");
+          remaining -= 0.5;
+        } else {
+          measureNotes.push("b4/16");
+          remaining -= 0.25;
+        }
+      }
+      measures.push(measureNotes.join(" "));
+      measureNotes = [];
+      currentBeats = 0;
+    };
+
     for (let i = 0; i < etude.length; i++) {
       const { note, duration } = etude[i];
-      const beat = { "q": 1, "8": 0.5, "16": 0.25 }[duration];
       const key = note.toLowerCase();
+      const beat = { "q": 1, "8": 0.5, "16": 0.25 }[duration];
 
+      // If note would overflow the measure, push current and start new
       if (currentBeats + beat > beatsPerMeasure) {
-        // Pad current measure with rests
-        const pad = beatsPerMeasure - currentBeats;
-        while (currentBeats < beatsPerMeasure) {
-          if (pad >= 1) {
-            measureNotes.push("b4/q");
-            currentBeats += 1;
-          } else if (pad >= 0.5) {
-            measureNotes.push("b4/8");
-            currentBeats += 0.5;
-          } else {
-            measureNotes.push("b4/16");
-            currentBeats += 0.25;
-          }
-        }
-        measures.push(measureNotes.join(" "));
-        measureNotes = [];
-        currentBeats = 0;
+        pushMeasure();
       }
 
       measureNotes.push(`${key}/${duration}`);
       currentBeats += beat;
     }
 
-    // Final measure
+    // Push last measure
     if (measureNotes.length > 0) {
-      while (currentBeats < beatsPerMeasure) {
-        if (beatsPerMeasure - currentBeats >= 1) {
-          measureNotes.push("b4/q");
-          currentBeats += 1;
-        } else if (beatsPerMeasure - currentBeats >= 0.5) {
-          measureNotes.push("b4/8");
-          currentBeats += 0.5;
-        } else {
-          measureNotes.push("b4/16");
-          currentBeats += 0.25;
-        }
-      }
-      measures.push(measureNotes.join(" "));
+      pushMeasure();
     }
+
 
 
     
