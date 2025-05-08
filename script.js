@@ -39,7 +39,7 @@ document.getElementById("generateBtn").addEventListener("click", async () => {
     const output = document.getElementById("output");
     output.innerHTML = "";
 
-    const VF = Vex.Flow;
+    const VF = Vexflow;
     const renderer = new VF.Renderer(output, VF.Renderer.Backends.SVG);
     renderer.resize(1000, 150 + numMeasures * 40);
     const context = renderer.getContext();
@@ -78,9 +78,9 @@ document.getElementById("generateBtn").addEventListener("click", async () => {
 
       // Add accidentals manually
       if (key.includes("#")) {
-        staveNote.addAccidental(0, new VF.Accidental("#"));
+        staveNote.addModifier(0, new VF.Accidental("#"));
       } else if (key.includes("b")) {
-        staveNote.addAccidental(0, new VF.Accidental("b"));
+        staveNote.addModifier(0, new VF.Accidental("b"));
       }
 
       notesInMeasure.push(staveNote);
