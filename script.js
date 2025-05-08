@@ -61,15 +61,46 @@ document.getElementById("generateBtn").addEventListener("click", async () => {
       const { note, duration } = etude[i];
       const beat = { "q": 1, "8": 0.5, "16": 0.25 }[duration];
       const key = note.toLowerCase();
-      measureNotes.push(`${key}/${duration}`);
-      currentBeats += beat;
 
-      if (currentBeats >= beatsPerMeasure || i === etude.length - 1) {
-        const measureString = measureNotes.join(" ");
-        measures.push(measureString);
+      if (currentBeats + beat > beatsPerMeasure) {
+        // Pad current measure with rests
+        const pad = beatsPerMeasure - currentBeats;
+        while (currentBeats < beatsPerMeasure) {
+          if (pad >= 1) {
+            measureNotes.push("b4/q");
+            currentBeats += 1;
+          } else if (pad >= 0.5) {
+            measureNotes.push("b4/8");
+            currentBeats += 0.5;
+          } else {
+            measureNotes.push("b4/16");
+            currentBeats += 0.25;
+          }
+        }
+        measures.push(measureNotes.join(" "));
         measureNotes = [];
         currentBeats = 0;
       }
+
+      measureNotes.push(`${key}/${duration}`);
+      currentBeats += beat;
+    }
+
+    // Final measure
+    if (measureNotes.length > 0) {
+      while (currentBeats < beatsPerMeasure) {
+        if (beatsPerMeasure - currentBeats >= 1) {
+          measureNotes.push("b4/q");
+          currentBeats += 1;
+        } else if (beatsPerMeasure - currentBeats >= 0.5) {
+          measureNotes.push("b4/8");
+          currentBeats += 0.5;
+        } else {
+          measureNotes.push("b4/16");
+          currentBeats += 0.25;
+        }
+      }
+      measures.push(measureNotes.join(" "));
     }
 
     const system = factory.System();
