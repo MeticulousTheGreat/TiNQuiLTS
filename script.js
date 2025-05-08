@@ -43,7 +43,9 @@ document.getElementById("generateBtn").addEventListener("click", async () => {
 
     // Add key signature if available
     if (selectedKeys.length > 0) {
-      stave.addKeySignature(selectedKeys[0]);
+      if (!["Chromatic"].includes(selectedKeys[0])) {
+        stave.addKeySignature(selectedKeys[0]);
+      }
     }
 
     stave.setContext(context).draw();
