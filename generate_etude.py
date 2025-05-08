@@ -1,6 +1,6 @@
 import random
 
-# Define scale notes for 12 major keys + Chromatic
+# Scale definitions
 SCALE_NOTES = {
     "C":  ["C", "D", "E", "F", "G", "A", "B"],
     "G":  ["G", "A", "B", "C", "D", "E", "F#"],
@@ -9,7 +9,6 @@ SCALE_NOTES = {
     "E":  ["E", "F#", "G#", "A", "B", "C#", "D#"],
     "B":  ["B", "C#", "D#", "E", "F#", "G#", "A#"],
     "F#": ["F#", "G#", "A#", "B", "C#", "D#", "E#"],
-    "Gb": ["Gb", "Ab", "Bb", "Cb", "Db", "Eb", "F"],
     "Db": ["Db", "Eb", "F", "Gb", "Ab", "Bb", "C"],
     "Ab": ["Ab", "Bb", "C", "Db", "Eb", "F", "G"],
     "Eb": ["Eb", "F", "G", "Ab", "Bb", "C", "D"],
@@ -18,61 +17,76 @@ SCALE_NOTES = {
     "Chromatic": ["C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "B"]
 }
 
-# Supported rhythm durations and their beat values
-DURATION_VALUES = {
-    "q": 1.0,
-    "8": 0.5,
-    "16": 0.25
-}
+# Rhythm durations and values
+DURATION_VALUES = { "q": 1.0, "8": 0.5, "16": 0.25 }
 DURATIONS = list(DURATION_VALUES.keys())
 
+# NEW: MIDI conversion helpers for octave range logic
+NOTE_TO_MIDI = {
+    "C": 0, "C#": 1, "Db": 1, "D": 2, "D#": 3, "Eb": 3,
+    "E": 4, "F": 5, "F#": 6, "Gb": 6, "G": 7, "G#": 8,
+    "Ab": 8, "A": 9, "A#": 10, "Bb": 10, "B": 11
+}
+
+def note_to_midi(note, octave):
+    return NOTE_TO_MIDI[note] + 12 * octave
+
+def midi_to_note(midi_num):
+    octave = midi_num // 12
+    note_val = midi_num % 12
+    for name, val in NOTE_TO_MIDI.items():
+        if val == note_val:
+            return f"{name}{octave}"
+    return "C4"
+
+# Core generator
 def generate_etude(config):
-    # Extract parameters from the frontend
     selected_keys = config.get("selected_keys", [])
     selected_rhythms = config.get("selected_rhythms", False)
     use_intervals = config.get("use_intervals", False)
     num_measures = config.get("num_measures", 4)
+    octave_range = config.get("octave_range", 2)  # NEW: default to 2 octave range
+    center_midi = 69  # A4
 
     beats_per_measure = 4
     total_beats = num_measures * beats_per_measure
-
     etude = []
 
-    # Default to C if no key is selected
     key = random.choice(selected_keys) if selected_keys else "C"
     scale = SCALE_NOTES.get(key, SCALE_NOTES["C"])
 
-    # Start from a random note index
-    current_index = random.randint(0, len(scale) - 1)
+    index = random.randint(0, len(scale) - 1)
+    current_octave = 4
     beats_remaining = total_beats
 
     while beats_remaining > 0:
-        # Select a rhythm duration
+        duration = "q"
+        dur_val = 1.0
+
         if selected_rhythms:
             duration = random.choice(DURATIONS)
-            dur_value = DURATION_VALUES[duration]
-        else:
-            duration = "q"
-            dur_value = 1.0
+            dur_val = DURATION_VALUES[duration]
+        if dur_val > beats_remaining:
+            continue
 
-        if dur_value > beats_remaining:
-            continue  # try again         NOTE: This may loop forever if there is not a small enough duration e.g. triplets maybe!
+        jump = random.randint(-7, 7) if use_intervals else random.choice([-1, 1])
+        next_index = (index + jump) % len(scale)
+        note_name = scale[next_index]
 
-        # Determine next note index
-        if use_intervals:
-            jump = random.randint(-7, 7)  # interval up to an octave
-        else:
-            jump = random.choice([-1, 1])  # stepwise
+        # NEW: Handle octave clamping
+        target_midi = note_to_midi(note_name, current_octave)
+        min_midi = center_midi - (6 * octave_range)
+        max_midi = center_midi + (6 * octave_range)
+        if target_midi < min_midi or target_midi > max_midi:
+            jump *= -1
+            next_index = (index + jump) % len(scale)
+            note_name = scale[next_index]
+            target_midi = note_to_midi(note_name, current_octave)
 
-        current_index = (current_index + jump) % len(scale)
-        note_name = scale[current_index] + "4"  # octave fixed for now
+        note = midi_to_note(target_midi)
+        etude.append({ "note": note, "duration": duration })
 
-        # Append note and duration
-        etude.append({
-            "note": note_name,
-            "duration": duration
-        })
-
-        beats_remaining -= dur_value
+        beats_remaining -= dur_val
+        index = next_index
 
     return etude
