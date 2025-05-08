@@ -54,45 +54,17 @@ document.getElementById("generateBtn").addEventListener("click", async () => {
     const measures = [];
     let measureNotes = [];
     let currentBeats = 0;
-    let beatsPerMeasure=4
+    let beatsPerMeasure=4;
+    const noteLengths = [['/q', 1],['/8', 0.5],['/q', 0.25]];
+    const randomLength = noteLengths[(Math.floor(Math.random() * noteLengths.length)),1];
+    
+    const makeEtudeList = () => {
+      let totalBeats = beatsPerMeasure*numMeasures;
+      let remaining = totalBeats - currentBeats;
+      while (remaining > 0) {}
 
-    const pushMeasure = () => {
-      let remaining = beatsPerMeasure - currentBeats;
-      while (remaining > 0) {
-        if (remaining >= 1) {
-          measureNotes.push("b4/q");
-          remaining -= 1;
-        } else if (remaining >= 0.5) {
-          measureNotes.push("b4/8");
-          remaining -= 0.5;
-        } else {
-          measureNotes.push("b4/16");
-          remaining -= 0.25;
-        }
-      }
-      measures.push(measureNotes.join(" "));
-      measureNotes = [];
-      currentBeats = 0;
-    };
-
-    for (let i = 0; i < etude.length; i++) {
-      const { note, duration } = etude[i];
-      const key = note.toLowerCase();
-      const beat = { "q": 1, "8": 0.5, "16": 0.25 }[duration];
-
-      // If note would overflow the measure, push current and start new
-      if (currentBeats + beat > beatsPerMeasure) {
-        pushMeasure();
-      }
-
-      measureNotes.push(`${key}/${duration}`);
-      currentBeats += beat;
-    }
-
-    // Push last measure
-    if (measureNotes.length > 0) {
-      pushMeasure();
-    }
+        //PMO 
+        // need to generate a big list of all the notes and then slice it up into measures
 
 
 
