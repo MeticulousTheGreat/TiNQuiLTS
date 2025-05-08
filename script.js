@@ -6,7 +6,6 @@ document.getElementById("numMeasures").addEventListener("input", function () {
   document.getElementById("measureValue").textContent = this.value;
 });
 
-// NEW: Octave range display
 document.getElementById("octaveRange").addEventListener("input", function () {
   document.getElementById("octaveRangeValue").textContent = this.value;
 });
@@ -17,7 +16,7 @@ document.getElementById("generateBtn").addEventListener("click", async () => {
   const useRhythms = document.getElementById("useRhythms").checked;
   const useIntervals = document.getElementById("useIntervals").checked;
   const numMeasures = parseInt(document.getElementById("numMeasures").value);
-  const octaveRange = parseInt(document.getElementById("octaveRange").value);  // NEW
+  const octaveRange = parseInt(document.getElementById("octaveRange").value);
 
   try {
     const res = await fetch("https://tinquilts-backend.onrender.com/generate", {
@@ -28,7 +27,7 @@ document.getElementById("generateBtn").addEventListener("click", async () => {
         selected_rhythms: useRhythms,
         use_intervals: useIntervals,
         num_measures: numMeasures,
-        octave_range: octaveRange  // NEW
+        octave_range: octaveRange
       })
     });
 
@@ -42,32 +41,62 @@ document.getElementById("generateBtn").addEventListener("click", async () => {
 
     const VF = Vex.Flow;
     const renderer = new VF.Renderer(output, VF.Renderer.Backends.SVG);
-    renderer.resize(800, 150 + numMeasures * 25);  // NEW: auto-resize
+    renderer.resize(1000, 150 + numMeasures * 40);
     const context = renderer.getContext();
 
-    const notesPerLine = 16;  // NEW: wrap every 16 notes
-    for (let i = 0; i < etude.length; i += notesPerLine) {
-      const slice = etude.slice(i, i + notesPerLine);
-      const stave = new VF.Stave(10, 40 + i * 5, 700);
-      stave.addClef("treble");
+    const staveWidth = 900;
+    const beatsPerMeasure = 4;
+    let currentY = 40;
+    let beatCount = 0;
+    let notesInMeasure = [];
 
-      // Skip invalid key signature for Chromatic
-      if (selectedKeys.length > 0 && selectedKeys[0] !== "Chromatic") {
+    const drawStave = (notes, isFirstMeasure) => {
+      const stave = new VF.Stave(10, currentY, staveWidth);
+      stave.addClef("treble");
+      if (isFirstMeasure && selectedKeys.length > 0 && selectedKeys[0] !== "Chromatic") {
         stave.addKeySignature(selectedKeys[0]);
       }
-
       stave.setContext(context).draw();
 
-      const vexNotes = slice.map(({ note, duration }) => {
-        const key = note.replace(/(\d)/, "/$1").toLowerCase();
-        return new VF.StaveNote({ keys: [key], duration });
+      const voice = new VF.Voice({ num_beats: beatsPerMeasure, beat_value: 4 });
+      voice.setMode(VF.Voice.Mode.STRICT);
+      voice.addTickables(notes);
+
+      new VF.Formatter().joinVoices([voice]).format([voice], staveWidth - 40);
+      voice.draw(context, stave);
+
+      currentY += 120;
+    };
+
+    for (let i = 0; i < etude.length; i++) {
+      const { note, duration } = etude[i];
+      const key = note.replace(/(\d)/, "/$1").toLowerCase();
+      const staveNote = new VF.StaveNote({
+        keys: [key],
+        duration: duration
       });
 
-      const voice = new VF.Voice({ num_beats: 4 * (slice.length / 4), beat_value: 4 });
-      voice.addTickables(vexNotes);
-      new VF.Formatter().joinVoices([voice]).format([voice], 600);
-      voice.draw(context, stave);
+      // Add accidentals manually
+      if (key.includes("#")) {
+        staveNote.addAccidental(0, new VF.Accidental("#"));
+      } else if (key.includes("b")) {
+        staveNote.addAccidental(0, new VF.Accidental("b"));
+      }
+
+      notesInMeasure.push(staveNote);
+      beatCount += { "q": 1, "8": 0.5, "16": 0.25 }[duration];
+
+      if (beatCount >= beatsPerMeasure) {
+        drawStave(notesInMeasure, i < beatsPerMeasure);
+        notesInMeasure = [];
+        beatCount = 0;
+      }
     }
+
+    if (notesInMeasure.length > 0) {
+      drawStave(notesInMeasure, false);
+    }
+
   } catch (err) {
     document.getElementById("output").textContent = `Error: ${err.message}`;
   }
