@@ -2,18 +2,19 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>TiNQuiLTS Etude Generator</title>
+  <title>TiNQuiLTS JS Etude Generator</title>
   <script src="https://cdn.jsdelivr.net/npm/vexflow@4.1.0/build/cjs/vexflow.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/midiwriter-js@2.1.4/dist/MidiWriter.min.js"></script>
   <script defer src="script.js"></script>
   <style>
     body { font-family: sans-serif; padding: 20px; }
     label { margin-right: 10px; }
-    input[type="range"] { width: 200px; }
     #output { margin-top: 40px; }
+    #midiLink { margin-top: 10px; display: none; }
   </style>
 </head>
 <body>
-  <h1>TiNQuiLTS Sightreading Generator</h1>
+  <h1>TiNQuiLTS Etude Generator (Frontend Only)</h1>
 
   <div>
     <label><strong>Keys:</strong></label><br/>
@@ -45,12 +46,6 @@
 
   <br/><br/>
 
-  <label>Tempo:</label>
-  <input type="range" id="tempo" min="40" max="200" value="120" />
-  <span id="tempoValue">120</span> bpm
-
-  <br/><br/>
-
   <label>Octave Range:</label>
   <input type="range" id="octaveRange" min="1" max="4" value="2" />
   <span id="octaveRangeValue">2</span> octaves
@@ -58,6 +53,7 @@
   <br/><br/>
 
   <button id="generateBtn">Generate Etude</button>
+  <a id="midiLink" target="_blank"></a>
 
   <div id="output"></div>
 </body>
