@@ -40,62 +40,53 @@ document.getElementById("generateBtn").addEventListener("click", async () => {
     output.innerHTML = "";
 
     const VF = Vex.Flow;
-    const renderer = new VF.Renderer(output, VF.Renderer.Backends.SVG);
-    renderer.resize(1000, 150 + numMeasures * 40);
-    const context = renderer.getContext();
-
-    const staveWidth = 900;
-    const beatsPerMeasure = 4;
-    let currentY = 40;
-    let beatCount = 0;
-    let notesInMeasure = [];
-
-    const drawStave = (notes, isFirstMeasure) => {
-      const stave = new VF.Stave(10, currentY, staveWidth);
-      stave.addClef("treble");
-      if (isFirstMeasure && selectedKeys.length > 0 && selectedKeys[0] !== "Chromatic") {
-        stave.addKeySignature(selectedKeys[0]);
+    const factory = new VF.Factory({
+      renderer: {
+        elementId: "output",
+        width: 900,
+        height: 150 + 120 * Math.ceil(etude.length / 16),
       }
-      stave.setContext(context).draw();
+    });
 
-      const voice = new VF.Voice({ num_beats: beatsPerMeasure, beat_value: 4 });
-      voice.setMode(VF.Voice.Mode.STRICT);
-      voice.addTickables(notes);
+    const score = factory.EasyScore();
+    const voices = [];
+    const measures = [];
+    let measureNotes = [];
 
-      new VF.Formatter().joinVoices([voice]).format([voice], staveWidth - 40);
-      voice.draw(context, stave);
+    let currentBeats = 0;
+    const beatsPerMeasure = 4;
 
-      currentY += 120;
-    };
-
+    // Group notes into measures based on rhythm durations
     for (let i = 0; i < etude.length; i++) {
       const { note, duration } = etude[i];
-      const key = note.replace(/(\d)/, "/$1").toLowerCase();
-      const staveNote = new VF.StaveNote({
-        keys: [key],
-        duration: duration
+      const beat = { "q": 1, "8": 0.5, "16": 0.25 }[duration];
+      const key = note.toLowerCase();
+      measureNotes.push(`${key}/${duration}`);
+      currentBeats += beat;
+
+      if (currentBeats >= beatsPerMeasure || i === etude.length - 1) {
+        const measureString = measureNotes.join(" ");
+        measures.push(measureString);
+        measureNotes = [];
+        currentBeats = 0;
+      }
+    }
+
+    const system = factory.System();
+    for (let i = 0; i < measures.length; i++) {
+      const stave = system.addStave({
+        voices: [score.voice(score.notes(measures[i]))]
       });
 
-      // Add accidentals manually
-      if (key.includes("#")) {
-        staveNote.addModifier(0, new VF.Accidental("#"));
-      } else if (key.includes("b")) {
-        staveNote.addModifier(0, new VF.Accidental("b"));
-      }
-
-      notesInMeasure.push(staveNote);
-      beatCount += { "q": 1, "8": 0.5, "16": 0.25 }[duration];
-
-      if (beatCount >= beatsPerMeasure) {
-        drawStave(notesInMeasure, i < beatsPerMeasure);
-        notesInMeasure = [];
-        beatCount = 0;
+      if (i === 0) {
+        stave.addClef("treble");
+        if (selectedKeys.length > 0 && selectedKeys[0] !== "Chromatic") {
+          stave.addKeySignature(selectedKeys[0]);
+        }
       }
     }
 
-    if (notesInMeasure.length > 0) {
-      drawStave(notesInMeasure, false);
-    }
+    factory.draw();
 
   } catch (err) {
     document.getElementById("output").textContent = `Error: ${err.message}`;
