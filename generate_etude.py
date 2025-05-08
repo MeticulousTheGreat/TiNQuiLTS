@@ -56,7 +56,7 @@ def generate_etude(config):
             dur_value = 1.0
 
         if dur_value > beats_remaining:
-            continue  # try smaller durations next loop
+            continue  # try again         NOTE: This may loop forever if there is not a small enough duration e.g. triplets maybe!
 
         # Determine next note index
         if use_intervals:
