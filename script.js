@@ -1,91 +1,139 @@
-document.getElementById("tempo").addEventListener("input", function () {
-  document.getElementById("tempoValue").textContent = this.value;
-});
+window.addEventListener("DOMContentLoaded", () => {
+  const VF = Vex.Flow;
+  const { Track, Writer, NoteEvent } = MidiWriter;
 
-document.getElementById("numMeasures").addEventListener("input", function () {
-  document.getElementById("measureValue").textContent = this.value;
-});
+  const durations = ["q", "8"];
+  const durationBeats = { "q": 1, "8": 0.5 };
+  const beatsPerMeasure = 4;
 
-document.getElementById("octaveRange").addEventListener("input", function () {
-  document.getElementById("octaveRangeValue").textContent = this.value;
-});
+  const SCALE_NOTES = {
+    "C":  ["C", "D", "E", "F", "G", "A", "B"],
+    "G":  ["G", "A", "B", "C", "D", "E", "F#"],
+    "D":  ["D", "E", "F#", "G", "A", "B", "C#"],
+    "A":  ["A", "B", "C#", "D", "E", "F#", "G#"],
+    "E":  ["E", "F#", "G#", "A", "B", "C#", "D#"],
+    "B":  ["B", "C#", "D#", "E", "F#", "G#", "A#"],
+    "F#": ["F#", "G#", "A#", "B", "C#", "D#", "E#"],
+    "Db": ["Db", "Eb", "F", "Gb", "Ab", "Bb", "C"],
+    "Ab": ["Ab", "Bb", "C", "Db", "Eb", "F", "G"],
+    "Eb": ["Eb", "F", "G", "Ab", "Bb", "C", "D"],
+    "Bb": ["Bb", "C", "D", "Eb", "F", "G", "A"],
+    "F":  ["F", "G", "A", "Bb", "C", "D", "E"],
+    "Chromatic": ["C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "B"]
+  };
 
-document.getElementById("generateBtn").addEventListener("click", async () => {
-  const selectedKeys = Array.from(document.querySelectorAll("input[name='keys']:checked"))
-    .map(el => el.value);
-  const useRhythms = document.getElementById("useRhythms").checked;
-  const useIntervals = document.getElementById("useIntervals").checked;
-  const numMeasures = parseInt(document.getElementById("numMeasures").value);
-  const octaveRange = parseInt(document.getElementById("octaveRange").value);
+  document.getElementById("numMeasures").addEventListener("input", function () {
+    document.getElementById("measureValue").textContent = this.value;
+  });
 
-  try {
-    const res = await fetch("https://tinquilts-backend.onrender.com/generate", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        selected_keys: selectedKeys,
-        selected_rhythms: useRhythms,
-        use_intervals: useIntervals,
-        num_measures: numMeasures,
-        octave_range: octaveRange
-      })
-    });
+  document.getElementById("octaveRange").addEventListener("input", function () {
+    document.getElementById("octaveRangeValue").textContent = this.value;
+  });
 
-    if (!res.ok) throw new Error("Failed to generate etude.");
+  document.getElementById("generateBtn").addEventListener("click", () => {
+    const selectedKeys = Array.from(document.querySelectorAll("input[name='keys']:checked")).map(k => k.value);
+    const useRhythms = document.getElementById("useRhythms").checked;
+    const useIntervals = document.getElementById("useIntervals").checked;
+    const numMeasures = parseInt(document.getElementById("numMeasures").value);
+    const octaveRange = parseInt(document.getElementById("octaveRange").value);
+    const centerOctave = 4;
 
-    const data = await res.json();
-    const etude = data.etude;
+    const totalBeats = numMeasures * beatsPerMeasure;
+    const key = selectedKeys.length ? selectedKeys[Math.floor(Math.random() * selectedKeys.length)] : "C";
+    const scale = SCALE_NOTES[key];
 
+    const notes = [];
+    let currentBeats = 0;
+    let index = Math.floor(Math.random() * scale.length);
+    let octave = centerOctave;
+
+    while (currentBeats < totalBeats) {
+      const dur = useRhythms ? durations[Math.floor(Math.random() * durations.length)] : "q";
+      let beatValue = durationBeats[dur];
+
+      if (currentBeats + beatValue > totalBeats) {
+        beatValue = totalBeats - currentBeats;
+      }
+
+      const jump = useIntervals ? Math.floor(Math.random() * 15) - 7 : (Math.random() < 0.5 ? -1 : 1);
+      index = (index + jump + scale.length) % scale.length;
+      let note = scale[index];
+
+      let midiNum = 12 * octave + noteToMidi(note);
+      const minMidi = 12 * centerOctave - (6 * octaveRange);
+      const maxMidi = 12 * centerOctave + (6 * octaveRange);
+      if (midiNum < minMidi || midiNum > maxMidi) {
+        octave = centerOctave;
+      }
+
+      notes.push({ pitch: note + octave, duration: dur });
+      currentBeats += beatValue;
+    }
+
+    renderNotation(notes, key);
+    generateMIDI(notes);
+  });
+
+  function noteToMidi(note) {
+    const map = { C:0, "C#":1, Db:1, D:2, "D#":3, Eb:3, E:4, F:5, "F#":6, Gb:6, G:7, "G#":8, Ab:8, A:9, "A#":10, Bb:10, B:11 };
+    return map[note];
+  }
+
+  function renderNotation(notes, keySignature) {
     const output = document.getElementById("output");
     output.innerHTML = "";
-
-    const VF = Vex.Flow;
     const factory = new VF.Factory({
-      renderer: {
-        elementId: "output",
-        width: 900,
-        height: 150 + 120 * Math.ceil(etude.length / 16),
-      }
+      renderer: { elementId: "output", width: 900, height: 250 }
     });
-
     const score = factory.EasyScore();
     const system = factory.System();
-  //  const voices = [];
+
     const measures = [];
-    let measureNotes = [];
-    let currentBeats = 0;
-    let beatsPerMeasure=4;
-    const noteLengths = [['/q', 1],['/8', 0.5],['/q', 0.25]];
-    const randomLength = noteLengths[(Math.floor(Math.random() * noteLengths.length)),1];
-    
-    const makeEtudeList = () => {
-      let totalBeats = beatsPerMeasure*numMeasures;
-      let remaining = totalBeats - currentBeats;
-      while (remaining > 0) {}
+    let current = [];
+    let beats = 0;
+    for (let n of notes) {
+      const beat = durationBeats[n.duration];
+      if (beats + beat > beatsPerMeasure) {
+        measures.push(current.join(" "));
+        current = [];
+        beats = 0;
+      }
+      current.push(`${n.pitch.toLowerCase()}/${n.duration}`);
+      beats += beat;
+    }
+    if (current.length) measures.push(current.join(" "));
 
-        //PMO 
-        // need to generate a big list of all the notes and then slice it up into measures
-
-
-
-    
-    //draw staves with easy score
     for (let i = 0; i < measures.length; i++) {
       const stave = system.addStave({
         voices: [score.voice(score.notes(measures[i]))]
       });
-
       if (i === 0) {
         stave.addClef("treble");
-        if (selectedKeys.length > 0 && selectedKeys[0] !== "Chromatic") {
-          stave.addKeySignature(selectedKeys[0]);
+        if (keySignature !== "Chromatic") {
+          stave.addKeySignature(keySignature);
         }
       }
     }
 
     factory.draw();
+  }
 
-  } catch (err) {
-    document.getElementById("output").textContent = `Error: ${err.message}`;
+  function generateMIDI(notes) {
+    const track = new Track();
+    notes.forEach(n => {
+      track.addEvent(new NoteEvent({
+        pitch: [n.pitch],
+        duration: n.duration === "q" ? "4" : "8"
+      }));
+    });
+
+    const write = new Writer([track]);
+    const blob = new Blob([write.buildFile()], { type: "audio/midi" });
+    const url = URL.createObjectURL(blob);
+
+    const audioLink = document.getElementById("midiLink");
+    audioLink.href = url;
+    audioLink.textContent = "Download / Play MIDI";
+    audioLink.style.display = "inline";
   }
 });
