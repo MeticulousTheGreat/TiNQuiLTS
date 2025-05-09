@@ -3,8 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <title>TiNQuiLTS</title>
-  <script src="https://cdn.jsdelivr.net/npm/vexflow@4.1.0/build/cjs/vexflow.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/midi-writer-js/browser/midiwriter.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/abcjs/dist/abcjs-basic-min.min.js"></script>
   <script defer src="script.js"></script>
   <style>
     body { font-family: sans-serif; padding: 20px; }
@@ -53,11 +52,12 @@
   <br/><br/>
 
   <button id="generateBtn">Generate Etude</button>
-  <a id="midiLink" target="_blank"></a>
+  
 
   <p id="debugger"> (debug output here) </p>
 
-  
+  <div id="abcNotation"></div>
+  <div id="abcControls"></div>
   <div id="output"></div>
 </body>
 </html>
