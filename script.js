@@ -72,6 +72,7 @@ window.addEventListener("DOMContentLoaded", () => {
 
     renderNotation(notes, key);
     generateMIDI(notes);
+    document.getElementById("debugger").innerHTML = notes, key;
   });
 
   function noteToMidi(note) {
