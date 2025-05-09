@@ -56,10 +56,10 @@ window.addEventListener("DOMContentLoaded", () => {
     }
 
     const abcString = header + abcNotes.join(" ") + " |]";
-    abcjs.renderAbc("abcNotation", abcString, {}, {});
+    ABCJS.renderAbc("abcNotation", abcString, {}, {});
 
     // Add synth playback
-    abcjs.renderMidi("abcControls", abcString, {
+    ABCJS.renderMidi("abcControls", abcString, {
       generateDownload: true,
       inlineControls: true,
       responsive: "resize"
