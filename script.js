@@ -35,8 +35,7 @@ window.addEventListener("DOMContentLoaded", () => {
   }
 
   function renderABC(notes, key, numMeasures) {
-    const beatsPerMeasure = 4;
-    const header = `X:1\nT:Etude\nM:4/4\nK:${key === "Chromatic" ? "C" : key}\nL:1/8\n`;
+    const header = `X:1\nT:ts etude pmo\nM:4/4\nK:${key === "Chromatic" ? "C" : key}\nL:1/8\n`;
 
     const abcNotes = [];
     let measureBeat = 0;
