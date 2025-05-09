@@ -1,7 +1,9 @@
 window.addEventListener("DOMContentLoaded", () => {
   
-  const durations = ["q", "8"];
-  const durationBeats = { "q": 1, "8": 0.5 };
+  const divisions = ["4", "8"];
+  function durationBeats(dur){
+     return 4 / dur;
+  };
   const beatsPerMeasure = 4;
 
   const SCALE_NOTES = {
@@ -35,14 +37,15 @@ window.addEventListener("DOMContentLoaded", () => {
   }
 
   function renderABC(notes, key, numMeasures) {
-    const header = `X:1\nT:ts etude pmo\nM:4/4\nK:${key === "Chromatic" ? "C" : key}\nL:1/8\n`;
+    const abcL = 8
+    const header = `X:1\nT:ts etude pmo\nM:4/4\nK:${key === "Chromatic" ? "C" : key}\nL:1/`+ stringify(abcL) +`\n`;
 
     const abcNotes = [];
     let measureBeat = 0;
 
     for (let n of notes) {
-      const dur = n.duration === "q" ? 1 : 0.5;
-      let abcDur = n.duration === "q" ? "" : ""; // L:1/8, so "q" is 2, "8" is 1
+      const dur = n.duration === "4" ? 1 : 0.5;
+      let abcDur = n.duration === "4" ? "" : ""; // L:1/8, so "q" is 2, "8" is 1
       if (dur === 1) abcDur = "2";
       const pitch = abcjsPitch(n.pitch);
       abcNotes.push(pitch + abcDur);
@@ -94,11 +97,11 @@ window.addEventListener("DOMContentLoaded", () => {
     let octave = centerOctave;
 
     while (currentBeats < totalBeats) {
-      const dur = useRhythms ? durations[Math.floor(Math.random() * durations.length)] : "q";
-      let beatValue = durationBeats[dur];
+      const dur = useRhythms ? divisions[Math.floor(Math.random() * divisions.length)] : "q";
+      let beatValue = durationBeats(dur);
 
       if (currentBeats + beatValue > totalBeats) {
-        beatValue = totalBeats - currentBeats;
+        continue;      // used to be beatValue = totalBeats - currentBeats
       }
 
       const jump = useIntervals ? Math.floor(Math.random() * 15) - 7 : (Math.random() < 0.5 ? -1 : 1);
