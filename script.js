@@ -76,17 +76,6 @@ window.addEventListener("DOMContentLoaded", () => {
   }
 
 
-    
-    const write = new Writer([track]);
-    const blob = new Blob([write.buildFile()], { type: "audio/midi" });
-    const url = URL.createObjectURL(blob);
-
-    const audioLink = document.getElementById("midiLink");
-    audioLink.href = url;
-    audioLink.textContent = "Download / Play MIDI";
-    audioLink.style.display = "inline";
-  }
-
   
   document.getElementById("generateBtn").addEventListener("click", () => {
     const selectedKeys = Array.from(document.querySelectorAll("input[name='keys']:checked")).map(k => k.value);
