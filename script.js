@@ -30,51 +30,6 @@ window.addEventListener("DOMContentLoaded", () => {
     document.getElementById("octaveRangeValue").textContent = this.value;
   });
 
-  document.getElementById("generateBtn").addEventListener("click", () => {
-    const selectedKeys = Array.from(document.querySelectorAll("input[name='keys']:checked")).map(k => k.value);
-    const useRhythms = document.getElementById("useRhythms").checked;
-    const useIntervals = document.getElementById("useIntervals").checked;
-    const numMeasures = parseInt(document.getElementById("numMeasures").value);
-    const octaveRange = parseInt(document.getElementById("octaveRange").value);
-    const centerOctave = 4;
-
-    const totalBeats = numMeasures * beatsPerMeasure;
-    const key = selectedKeys.length ? selectedKeys[Math.floor(Math.random() * selectedKeys.length)] : "C";
-    const scale = SCALE_NOTES[key];
-
-    const notes = [];
-    let currentBeats = 0;
-    let index = Math.floor(Math.random() * scale.length);
-    let octave = centerOctave;
-
-    while (currentBeats < totalBeats) {
-      const dur = useRhythms ? durations[Math.floor(Math.random() * durations.length)] : "q";
-      let beatValue = durationBeats[dur];
-
-      if (currentBeats + beatValue > totalBeats) {
-        beatValue = totalBeats - currentBeats;
-      }
-
-      const jump = useIntervals ? Math.floor(Math.random() * 15) - 7 : (Math.random() < 0.5 ? -1 : 1);
-      index = (index + jump + scale.length) % scale.length;
-      let note = scale[index];
-
-      let midiNum = 12 * octave + noteToMidi(note);
-      const minMidi = 12 * centerOctave - (6 * octaveRange);
-      const maxMidi = 12 * centerOctave + (6 * octaveRange);
-      if (midiNum < minMidi || midiNum > maxMidi) {
-        octave = centerOctave;
-      }
-
-      notes.push({ pitch: note + octave, duration: dur });
-      currentBeats += beatValue;
-    }
-
-    document.getElementById("debugger").innerHTML = JSON.stringify(key);
-    renderNotation(notes, key);
-    generateMIDI(notes);
-    
-  });
 
   function noteToMidi(note) {
     const map = { C:0, "C#":1, Db:1, D:2, "D#":3, Eb:3, E:4, F:5, "F#":6, Gb:6, G:7, "G#":8, Ab:8, A:9, "A#":10, Bb:10, B:11 };
@@ -129,6 +84,52 @@ window.addEventListener("DOMContentLoaded", () => {
       }));
     });
 
+  document.getElementById("generateBtn").addEventListener("click", () => {
+    const selectedKeys = Array.from(document.querySelectorAll("input[name='keys']:checked")).map(k => k.value);
+    const useRhythms = document.getElementById("useRhythms").checked;
+    const useIntervals = document.getElementById("useIntervals").checked;
+    const numMeasures = parseInt(document.getElementById("numMeasures").value);
+    const octaveRange = parseInt(document.getElementById("octaveRange").value);
+    const centerOctave = 4;
+
+    const totalBeats = numMeasures * beatsPerMeasure;
+    const key = selectedKeys.length ? selectedKeys[Math.floor(Math.random() * selectedKeys.length)] : "C";
+    const scale = SCALE_NOTES[key];
+
+    const notes = [];
+    let currentBeats = 0;
+    let index = Math.floor(Math.random() * scale.length);
+    let octave = centerOctave;
+
+    while (currentBeats < totalBeats) {
+      const dur = useRhythms ? durations[Math.floor(Math.random() * durations.length)] : "q";
+      let beatValue = durationBeats[dur];
+
+      if (currentBeats + beatValue > totalBeats) {
+        beatValue = totalBeats - currentBeats;
+      }
+
+      const jump = useIntervals ? Math.floor(Math.random() * 15) - 7 : (Math.random() < 0.5 ? -1 : 1);
+      index = (index + jump + scale.length) % scale.length;
+      let note = scale[index];
+
+      let midiNum = 12 * octave + noteToMidi(note);
+      const minMidi = 12 * centerOctave - (6 * octaveRange);
+      const maxMidi = 12 * centerOctave + (6 * octaveRange);
+      if (midiNum < minMidi || midiNum > maxMidi) {
+        octave = centerOctave;
+      }
+
+      notes.push({ pitch: note + octave, duration: dur });
+      currentBeats += beatValue;
+    }
+
+    document.getElementById("debugger").innerHTML = JSON.stringify(key);
+    renderNotation(notes, key);
+    generateMIDI(notes);
+    
+  });
+    
     const write = new Writer([track]);
     const blob = new Blob([write.buildFile()], { type: "audio/midi" });
     const url = URL.createObjectURL(blob);
