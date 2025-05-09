@@ -38,16 +38,15 @@ window.addEventListener("DOMContentLoaded", () => {
 
   function renderNotation(notes, keySignature) {
     const output = document.getElementById("output");
-    output.innerHTML = "";
-    const factory = new VF.Factory({
-      renderer: { elementId: "output", width: 900, height: 250 }
-    });
-    const score = factory.EasyScore();
-    const system = factory.System();
+    output.innerHTML = ""; // clears the previous etude 
+    var vf = new VF.Factory({renderer: { elementId: "output", width: 900, height: 250 }});
+    var score = vf.EasyScore();
+    var system = vf.System();
 
     const measures = [];
     let current = [];
     let beats = 0;
+    /*
     for (let n of notes) {
       const beat = durationBeats[n.duration];
       if (beats + beat > beatsPerMeasure) {
@@ -59,7 +58,7 @@ window.addEventListener("DOMContentLoaded", () => {
       beats += beat;
     }
     if (current.length) measures.push(current.join(" "));
-
+*/
     for (let i = 0; i < measures.length; i++) {
       const stave = system.addStave({
         voices: [score.voice(score.notes(measures[i]))]
@@ -71,7 +70,7 @@ window.addEventListener("DOMContentLoaded", () => {
         }
       }
     }
-    factory.draw();
+    vf.draw();
   }
 
   function generateMIDI(notes) {
@@ -137,7 +136,7 @@ window.addEventListener("DOMContentLoaded", () => {
 
     document.getElementById("debugger").innerHTML = JSON.stringify(key) + "<br>" + JSON.stringify(notes);
     renderNotation(notes, key);
-    generateMIDI(notes);
+    //generateMIDI(notes);
   });
   
 });
