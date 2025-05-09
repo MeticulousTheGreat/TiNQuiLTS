@@ -135,7 +135,7 @@ window.addEventListener("DOMContentLoaded", () => {
       currentBeats += beatValue;
     }
 
-    document.getElementById("debugger").innerHTML = JSON.stringify(key) + JSON.stringify(notes);
+    document.getElementById("debugger").innerHTML = JSON.stringify(key) + "<br>" + JSON.stringify(notes);
     renderNotation(notes, key);
     generateMIDI(notes);
   });
