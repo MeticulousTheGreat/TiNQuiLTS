@@ -1,7 +1,5 @@
 window.addEventListener("DOMContentLoaded", () => {
-  const VF = Vex.Flow;
-  const { Track, Writer, NoteEvent } = MidiWriter;
-
+  
   const durations = ["q", "8"];
   const durationBeats = { "q": 1, "8": 0.5 };
   const beatsPerMeasure = 4;
@@ -36,51 +34,47 @@ window.addEventListener("DOMContentLoaded", () => {
     return map[note];
   }
 
-  function renderNotation(notes, keySignature) {
-    const output = document.getElementById("output");
-    output.innerHTML = ""; // clears the previous etude 
-    var vf = new VF.Factory({renderer: { elementId: "output", width: 900, height: 250 }});
-    var score = vf.EasyScore();
-    var system = vf.System();
+  function renderABC(notes, key, numMeasures) {
+    const beatsPerMeasure = 4;
+    const header = `X:1\nT:Etude\nM:4/4\nK:${key === "Chromatic" ? "C" : key}\nL:1/8\n`;
 
-    const measures = [];
-    let current = [];
-    let beats = 0;
-    /*
+    const abcNotes = [];
+    let measureBeat = 0;
+
     for (let n of notes) {
-      const beat = durationBeats[n.duration];
-      if (beats + beat > beatsPerMeasure) {
-        measures.push(current.join(" "));
-        current = [];
-        beats = 0;
-      }
-      current.push(`${n.pitch.toLowerCase()}/${n.duration}`);
-      beats += beat;
-    }
-    if (current.length) measures.push(current.join(" "));
-*/
-    for (let i = 0; i < measures.length; i++) {
-      const stave = system.addStave({
-        voices: [score.voice(score.notes(measures[i]))]
-      });
-      if (i === 0) {
-        stave.addClef("treble");
-        if (keySignature !== "Chromatic") {
-          stave.addKeySignature(keySignature);
-        }
+      const dur = n.duration === "q" ? 1 : 0.5;
+      let abcDur = n.duration === "q" ? "" : ""; // L:1/8, so "q" is 2, "8" is 1
+      if (dur === 1) abcDur = "2";
+      const pitch = abcjsPitch(n.pitch);
+      abcNotes.push(pitch + abcDur);
+      measureBeat += dur;
+  
+      if (measureBeat >= beatsPerMeasure) {
+        abcNotes.push("|");
+        measureBeat = 0;
       }
     }
-    vf.draw();
+
+    const abcString = header + abcNotes.join(" ") + " |]";
+    abcjs.renderAbc("abcNotation", abcString, {}, {});
+
+    // Add synth playback
+    abcjs.renderMidi("abcControls", abcString, {
+      generateDownload: true,
+      inlineControls: true,
+      responsive: "resize"
+    });
   }
 
-  function generateMIDI(notes) {
-    const track = new Track();
-    notes.forEach(n => {
-      track.addEvent(new NoteEvent({
-        pitch: [n.pitch],
-        duration: n.duration === "q" ? "4" : "8"
-      }));
-    });
+  function abcjsPitch(note) {
+    const [letter, octaveStr] = note.match(/[A-Ga-g#b]+|\d+/g);
+    const octave = parseInt(octaveStr);
+    const base = letter.replace("b", "_").replace("#", "^");
+    if (octave < 5) return base.toLowerCase().repeat(6 - octave);
+    if (octave === 5) return base;
+    return base.toLowerCase() + "'".repeat(octave - 5);
+  }
+
 
     
     const write = new Writer([track]);
@@ -135,8 +129,7 @@ window.addEventListener("DOMContentLoaded", () => {
     }
 
     document.getElementById("debugger").innerHTML = JSON.stringify(key) + "<br>" + JSON.stringify(notes);
-    renderNotation(notes, key);
-    //generateMIDI(notes);
+    renderABC(notes, key, numMeasures);
   });
   
 });
