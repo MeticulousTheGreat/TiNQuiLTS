@@ -101,7 +101,7 @@ window.addEventListener("DOMContentLoaded", () => {
       let beatValue = durationBeats(dur);
 
       if (currentBeats + beatValue > totalBeats) {
-        continue;      // used to be beatValue = totalBeats - currentBeats
+        beatValue = totalBeats - currentBeats;      // used to be continue
       }
 
       const jump = useIntervals ? Math.floor(Math.random() * 15) - 7 : (Math.random() < 0.5 ? -1 : 1);
