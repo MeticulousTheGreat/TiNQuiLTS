@@ -70,9 +70,10 @@ window.addEventListener("DOMContentLoaded", () => {
       currentBeats += beatValue;
     }
 
+    document.getElementById("debugger").innerHTML = notes, key;
     renderNotation(notes, key);
     generateMIDI(notes);
-    document.getElementById("debugger").innerHTML = notes, key;
+    
   });
 
   function noteToMidi(note) {
