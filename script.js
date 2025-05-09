@@ -44,8 +44,8 @@ window.addEventListener("DOMContentLoaded", () => {
     let measureBeat = 0;
 
     for (let n of notes) {
-      const dur = n.duration === "4" ? 1 : 0.5;
-      let abcDur = n.duration === "4" ? "" : ""; // L:1/8, so "4" is 2, "8" is 1
+      const dur = n.division === "4" ? 1 : 0.5;
+      let abcDur = n.division / 4 === 1 ? "" : ""; // L:1/8, so "4" is 2, "8" is 1
       if (dur === 1) abcDur = "2";
       const pitch = abcjsPitch(n.pitch);
       abcNotes.push(pitch + abcDur);
@@ -115,7 +115,7 @@ window.addEventListener("DOMContentLoaded", () => {
         octave = centerOctave;
       }
 
-      notes.push({ pitch: note + octave, duration: dur });
+      notes.push({ pitch: note + octave, division: dur });
       currentBeats += beatValue;
     }
 
