@@ -98,7 +98,7 @@ window.addEventListener("DOMContentLoaded", () => {
     const useIntervals = document.getElementById("useIntervals").checked;
     const numMeasures = parseInt(document.getElementById("numMeasures").value);
     const octaveRange = parseInt(document.getElementById("octaveRange").value);
-    const centerOctave = 4;
+    const centerOctave = 3;
 
     const totalBeats = numMeasures * beatsPerMeasure;
     const key = selectedKeys.length ? selectedKeys[Math.floor(Math.random() * selectedKeys.length)] : "C";
