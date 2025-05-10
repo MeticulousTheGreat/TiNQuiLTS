@@ -60,6 +60,8 @@ window.addEventListener("DOMContentLoaded", () => {
     const abcString = header + abcNotes.join(" ") + " |]";
     ABCJS.renderAbc("abcNotation", abcString, {}, {});
 
+    document.getElementById("rawNotation").innerHTML = abcString;
+
     // Add synth playback
     ABCJS.renderMidi("abcControls", abcString, {
       generateDownload: true,
