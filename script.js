@@ -98,7 +98,7 @@ window.addEventListener("DOMContentLoaded", () => {
     const doJumps = document.getElementById("doJumps").checked;
     const numMeasures = parseInt(document.getElementById("numMeasures").value);
     const octaveRange = parseInt(document.getElementById("octaveRange").value);
-    const centerOctave = 3;
+    const centerOctave = parseInt(document.getElementById("centerOctave").value);
 
     const totalBeats = numMeasures * beatsPerMeasure;
     const key = selectedKeys.length ? selectedKeys[Math.floor(Math.random() * selectedKeys.length)] : "C";
@@ -111,8 +111,8 @@ window.addEventListener("DOMContentLoaded", () => {
 
     let noteObj = { note: scale[index], octave: centerOctave };
     const centerMidi = 12 * centerOctave + noteToMidi("A");
-    const minMidi = centerMidi - 12 * octaveRange;
-    const maxMidi = centerMidi + 12 * octaveRange;
+    const minMidi = centerMidi - Math.floor(12 * octaveRange);
+    const maxMidi = centerMidi + Math.floor(12 * octaveRange);
 
     
     while (currentBeats < totalBeats) {
