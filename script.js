@@ -95,7 +95,7 @@ window.addEventListener("DOMContentLoaded", () => {
   document.getElementById("generateBtn").addEventListener("click", () => {
     const selectedKeys = Array.from(document.querySelectorAll("input[name='keys']:checked")).map(k => k.value);
     const useRhythms = document.getElementById("useRhythms").checked;
-    const useIntervals = document.getElementById("useIntervals").checked;
+    const doJumps = document.getElementById("doJumps").checked;
     const numMeasures = parseInt(document.getElementById("numMeasures").value);
     const octaveRange = parseInt(document.getElementById("octaveRange").value);
     const centerOctave = 3;
@@ -107,8 +107,14 @@ window.addEventListener("DOMContentLoaded", () => {
     const notes = [];
     let currentBeats = 0;
     let index = Math.floor(Math.random() * scale.length);
-    let octave = centerOctave;
+    //let octave = centerOctave;
 
+    let noteObj = { note: scale[index], octave: centerOctave };
+    const centerMidi = 12 * centerOctave + noteToMidi("A");
+    const minMidi = centerMidi - 12 * octaveRange;
+    const maxMidi = centerMidi + 12 * octaveRange;
+
+    
     while (currentBeats < totalBeats) {
       const dur = useRhythms ? divisions[Math.floor(Math.random() * divisions.length)] : "4";
       let beatValue = durationBeats(dur);
@@ -117,18 +123,22 @@ window.addEventListener("DOMContentLoaded", () => {
         beatValue = totalBeats - currentBeats;      // maybe continue would work?
       }
 
-      const jump = useIntervals ? Math.floor(Math.random() * 15) - 7 : (Math.random() < 0.5 ? -1 : 1);
-      index = (index + jump + scale.length) % scale.length;
-      let note = scale[index];
+      const interval = doJumps ? Math.floor(Math.random() * 15) - 7 : (Math.random() < 0.5 ? 1 : -1);
+      let newIndex = (scale.indexOf(noteObj.note) + interval + scale.length) % scale.length;
+      let newOctave = noteObj.octave + Math.floor((scale.indexOf(noteObj.note) + interval) / scale.length);
+      let candidate = { note: scale[newIndex], octave: newOctave };
 
-      let midiNum = 12 * octave + noteToMidi(note);
-      const minMidi = 12 * centerOctave - (6 * octaveRange);
-      const maxMidi = 12 * centerOctave + (6 * octaveRange);
-      if (midiNum < minMidi || midiNum > maxMidi) {
-        octave = centerOctave;
+      let midiValue = noteToMidi(candidate.note) + 12 * candidate.octave;
+      if (midiValue < minMidi || midiValue > maxMidi) {
+        // Flip interval and retry
+        const flippedInterval = -interval;
+        newIndex = (scale.indexOf(noteObj.note) + flippedInterval + scale.length) % scale.length;
+        newOctave = noteObj.octave + Math.floor((scale.indexOf(noteObj.note) + flippedInterval) / scale.length);
+        candidate = { note: scale[newIndex], octave: newOctave };
       }
 
-      notes.push({ pitch: note + octave, division: dur });
+      notes.push({ pitch: candidate.note + candidate.octave, division: dur });
+      noteObj = candidate;
       currentBeats += beatValue;
     }
 
