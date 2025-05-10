@@ -86,7 +86,7 @@ window.addEventListener("DOMContentLoaded", () => {
     // Map octave
     if (octave < 4) return base + ",".repeat(4 - octave);     // C3 → C,
     if (octave === 4) return base;                            // C4 → C
-    return base.toLowerCase() + "'".repeat(octave - 4);       // C5 → c'
+    return base.toLowerCase() + "'".repeat(octave - 5);       // C5 → c and C6 to c'
   }
 
 
