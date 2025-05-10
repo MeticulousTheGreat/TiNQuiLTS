@@ -73,11 +73,22 @@ window.addEventListener("DOMContentLoaded", () => {
   function abcjsPitch(note) {
     const [letter, octaveStr] = note.match(/[A-Ga-g#b]+|\d+/g);
     const octave = parseInt(octaveStr);
-    const base = letter.replace("b", "_").replace("#", "^");
-    if (octave < 5) return base.toLowerCase().repeat(6 - octave);
-    if (octave === 5) return base;
-    return base.toLowerCase() + "'".repeat(octave - 5);
+  
+    // Accidental goes before the letter in ABC
+    let baseLetter = letter[0].toUpperCase();
+    let accidental = "";
+  
+    if (letter.includes("b")) accidental = "_";
+    if (letter.includes("#")) accidental = "^";
+
+    const base = accidental + baseLetter;
+
+    // Map octave
+    if (octave < 4) return base + ",".repeat(3 - octave);     // C3 → C,
+    if (octave === 4) return base;                            // C4 → C
+    return base.toLowerCase() + "'".repeat(octave - 4);       // C5 → c'
   }
+
 
 
   
@@ -103,7 +114,7 @@ window.addEventListener("DOMContentLoaded", () => {
       let beatValue = durationBeats(dur);
 
       if (currentBeats + beatValue > totalBeats) {
-        beatValue = totalBeats - currentBeats;      // used to be continue
+        beatValue = totalBeats - currentBeats;      // maybe continue would work?
       }
 
       const jump = useIntervals ? Math.floor(Math.random() * 15) - 7 : (Math.random() < 0.5 ? -1 : 1);
