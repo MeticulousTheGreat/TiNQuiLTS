@@ -84,7 +84,7 @@ window.addEventListener("DOMContentLoaded", () => {
     const base = accidental + baseLetter;
 
     // Map octave
-    if (octave < 4) return base + ",".repeat(3 - octave);     // C3 → C,
+    if (octave < 4) return base + ",".repeat(4 - octave);     // C3 → C,
     if (octave === 4) return base;                            // C4 → C
     return base.toLowerCase() + "'".repeat(octave - 4);       // C5 → c'
   }
