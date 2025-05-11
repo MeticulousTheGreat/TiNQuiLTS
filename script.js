@@ -165,6 +165,7 @@ window.addEventListener("DOMContentLoaded", () => {
   function prepAudio () {
     const tempo = parseInt(document.getElementById("tempoSlider").value);
     let mPM = beatsPerMeasure * 60000 / tempo;
+    console.log(mPM)
     
     var visualOptions = { responsive: 'resize' };
     var visualObj = ABCJS.renderAbc("paper", convertedABC, visualOptions);
