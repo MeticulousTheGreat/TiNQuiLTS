@@ -1,7 +1,7 @@
 window.addEventListener("DOMContentLoaded", () => {
 
   const notes = []
-  const key = "C"
+  let key = "C"
   
   const divisions = ["4", "8"];
   function durationBeats(dur){return 4 / dur};
