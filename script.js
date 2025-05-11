@@ -108,10 +108,10 @@ window.addEventListener("DOMContentLoaded", () => {
     const centerOctave = parseInt(document.getElementById("centerOctave").value);
 
     const totalBeats = numMeasures * beatsPerMeasure;
-    const key = selectedKeys.length ? selectedKeys[Math.floor(Math.random() * selectedKeys.length)] : "C";
+    var key = selectedKeys.length ? selectedKeys[Math.floor(Math.random() * selectedKeys.length)] : "C";
     const scale = SCALE_NOTES[key];
 
-    const notes = [];
+    var notes = [];
     let currentBeats = 0;
     let index = Math.floor(Math.random() * scale.length);
     //let octave = centerOctave;
@@ -150,9 +150,6 @@ window.addEventListener("DOMContentLoaded", () => {
     }
 
     console.log("Generated key and notes:<br>" + JSON.stringify(key) + "<br>" + JSON.stringify(notes));
-
-    convertedABC = notesToABC(notes, key, numMeasures)
-    document.getElementById("rawNotation").innerHTML = convertedABC;    
     prepAudio()
   });
 
@@ -163,9 +160,10 @@ window.addEventListener("DOMContentLoaded", () => {
     
     
   function prepAudio () {
-    const tempo = parseInt(document.getElementById("tempoSlider").value);
-    let mPM = beatsPerMeasure * 60000 / tempo;
-    console.log(mPM)
+    ABCJS.midi.stopPlaying();
+    const tempo = document.getElementById("tempoSlider").value);
+    convertedABC = `Q:1/4=` + tempo + notesToABC(notes, key, numMeasures)
+    document.getElementById("rawNotation").innerHTML = convertedABC;
     
     var visualOptions = { responsive: 'resize' };
     var visualObj = ABCJS.renderAbc("paper", convertedABC, visualOptions);
@@ -173,7 +171,8 @@ window.addEventListener("DOMContentLoaded", () => {
     if (ABCJS.synth.supportsAudio()) {
         var controlOptions = {
             displayRestart: true,
-            displayPlay: true
+            displayPlay: true,
+            displayLoop: true
         };
         var synthControl = new ABCJS.synth.SynthController();
         synthControl.load("#audio", null, controlOptions);
@@ -181,7 +180,6 @@ window.addEventListener("DOMContentLoaded", () => {
         var midiBuffer = new ABCJS.synth.CreateSynth();
         midiBuffer.init({
             visualObj: visualObj[0],
-            millisecondsPerMeasure: mPM,
             options: {
                 
             }
