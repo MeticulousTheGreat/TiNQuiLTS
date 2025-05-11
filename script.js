@@ -149,7 +149,7 @@ window.addEventListener("DOMContentLoaded", () => {
     const convertedABC = notesToABC(notes, key, numMeasures)
     document.getElementById("rawNotation").innerHTML = convertedABC;    
     ABCJS.renderAbc("paper", convertedABC, {});
-  };
+  });
 
   
   document.getElementById("prepBtn").addEventListener("click", () => {
