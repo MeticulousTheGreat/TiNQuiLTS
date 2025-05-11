@@ -1,6 +1,7 @@
 window.addEventListener("DOMContentLoaded", () => {
 
-  var notes = []
+  const notes = []
+  const key = "C"
   
   const divisions = ["4", "8"];
   function durationBeats(dur){return 4 / dur};
@@ -110,7 +111,7 @@ window.addEventListener("DOMContentLoaded", () => {
     const centerOctave = parseInt(document.getElementById("centerOctave").value);
 
     const totalBeats = numMeasures * beatsPerMeasure;
-    var key = selectedKeys.length ? selectedKeys[Math.floor(Math.random() * selectedKeys.length)] : "C";
+    key = selectedKeys.length ? selectedKeys[Math.floor(Math.random() * selectedKeys.length)] : "C";
     const scale = SCALE_NOTES[key];
 
     notes = [];
