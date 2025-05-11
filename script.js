@@ -61,7 +61,7 @@ window.addEventListener("DOMContentLoaded", () => {
     }
 
     const abcString = header + abcNotes.join(" ") + " |]";
-    ABCJS.renderAbc("abcNotation", abcString, {}, {});
+    ABCJS.renderAbc("paper", abcString, {}, {});
 
     document.getElementById("rawNotation").innerHTML = abcString;
 
