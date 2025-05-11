@@ -181,7 +181,7 @@ window.addEventListener("DOMContentLoaded", () => {
         var midiBuffer = new ABCJS.synth.CreateSynth();
         midiBuffer.init({
             visualObj: visualObj[0],
-            millisecondsPerMeasure: 800,
+            millisecondsPerMeasure: mPM,
             options: {
                 
             }
