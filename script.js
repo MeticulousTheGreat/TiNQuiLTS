@@ -153,11 +153,11 @@ window.addEventListener("DOMContentLoaded", () => {
 
     convertedABC = notesToABC(notes, key, numMeasures)
     document.getElementById("rawNotation").innerHTML = convertedABC;    
-    ABCJS.renderAbc("paper", convertedABC, {});
-  });
+    //ABCJS.renderAbc("paper", convertedABC, {});
+  //});
 
   
-  document.getElementById("prepBtn").addEventListener("click", () => {
+  //document.getElementById("prepBtn").addEventListener("click", () => {
     const tempo = parseInt(document.getElementById("tempoSlider").value);
           
     var visualOptions = { responsive: 'resize' };
