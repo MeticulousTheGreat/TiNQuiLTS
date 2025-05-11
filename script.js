@@ -146,9 +146,14 @@ window.addEventListener("DOMContentLoaded", () => {
 
     const convertedABC = notesToABC(notes, key, numMeasures)
     document.getElementById("rawNotation").innerHTML = convertedABC;    
-    //ABCJS.renderAbc("paper", convertedABC, {}, {});
+    ABCJS.renderAbc("paper", convertedABC, {}, {});
+  };
 
-    var visualOptions = {  };
+  
+  document.getElementById("prepBtn").addEventListener("click", () => {
+    const tempo = parseInt(document.getElementById("tempoSlider").value);
+          
+    var visualOptions = { responsive: 'resize' };
     var visualObj = ABCJS.renderAbc("paper", convertedABC, visualOptions);
     
     if (ABCJS.synth.supportsAudio()) {
@@ -163,7 +168,7 @@ window.addEventListener("DOMContentLoaded", () => {
         var midiBuffer = new ABCJS.synth.CreateSynth();
         midiBuffer.init({
             visualObj: visualObj[0],
-            millisecondsPerMeasure: 800,
+            millisecondsPerMeasure: (beatsPerMeasure * 60000 / tempo),
             options: {
                 
             }
