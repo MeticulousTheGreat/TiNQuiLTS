@@ -145,7 +145,7 @@ window.addEventListener("DOMContentLoaded", () => {
       currentBeats += beatValue;
     }
 
-    document.getElementById("debugger").innerHTML = JSON.stringify(key) + "<br>" + JSON.stringify(notes);
+    consol.log("Generated key and notes:<br>" + JSON.stringify(key) + "<br>" + JSON.stringify(notes));
     renderABC(notes, key, numMeasures);
   });
   
