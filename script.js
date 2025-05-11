@@ -173,8 +173,7 @@ window.addEventListener("DOMContentLoaded", () => {
     if (ABCJS.synth.supportsAudio()) {
         var controlOptions = {
             displayRestart: true,
-            displayPlay: true,
-            displayLoop: true
+            displayPlay: true
         };
         var synthControl = new ABCJS.synth.SynthController();
         synthControl.load("#audio", null, controlOptions);
@@ -182,7 +181,7 @@ window.addEventListener("DOMContentLoaded", () => {
         var midiBuffer = new ABCJS.synth.CreateSynth();
         midiBuffer.init({
             visualObj: visualObj[0],
-            millisecondsPerMeasure: mPM,
+            millisecondsPerMeasure: 800,
             options: {
                 
             }
@@ -195,9 +194,6 @@ window.addEventListener("DOMContentLoaded", () => {
     } else {
         console.log("audio is not supported on this browser");
     };
-
-
-    
   };
   
 });
