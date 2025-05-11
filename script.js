@@ -94,6 +94,11 @@ window.addEventListener("DOMContentLoaded", () => {
 
 
   
+  let convertedABC = {}
+
+
+
+  
   document.getElementById("generateBtn").addEventListener("click", () => {
     const selectedKeys = Array.from(document.querySelectorAll("input[name='keys']:checked")).map(k => k.value);
     const useRhythms = document.getElementById("useRhythms").checked;
@@ -146,7 +151,7 @@ window.addEventListener("DOMContentLoaded", () => {
 
     console.log("Generated key and notes:<br>" + JSON.stringify(key) + "<br>" + JSON.stringify(notes));
 
-    const convertedABC = notesToABC(notes, key, numMeasures)
+    convertedABC = notesToABC(notes, key, numMeasures)
     document.getElementById("rawNotation").innerHTML = convertedABC;    
     ABCJS.renderAbc("paper", convertedABC, {});
   });
