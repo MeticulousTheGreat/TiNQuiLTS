@@ -148,7 +148,7 @@ window.addEventListener("DOMContentLoaded", () => {
 
     const convertedABC = notesToABC(notes, key, numMeasures)
     document.getElementById("rawNotation").innerHTML = convertedABC;    
-    ABCJS.renderAbc("paper", convertedABC, {}, {});
+    ABCJS.renderAbc("paper", convertedABC, {});
   };
 
   
