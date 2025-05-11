@@ -22,19 +22,21 @@ window.addEventListener("DOMContentLoaded", () => {
 
 
   
-  document.getElementById("numMeasures").addEventListener("input", function () {        //get how many measures to generate
+  document.getElementById("numMeasures").addEventListener("input", function () {        //update measures
     document.getElementById("measureValue").textContent = this.value;
   });
 
-  document.getElementById("octaveRange").addEventListener("input", function () {        //get octave range
+  document.getElementById("octaveRange").addEventListener("input", function () {        //update range
     document.getElementById("octaveRangeValue").textContent = this.value;
   });
 
-  document.getElementById("centerOctave").addEventListener("input", function () {        //get center of range
+  document.getElementById("centerOctave").addEventListener("input", function () {        //update center of range
     document.getElementById("centerOctaveValue").textContent = this.value;
   });
 
-
+  document.getElementById("tempoSlider").addEventListener("input", function () {        //update tempo
+    document.getElementById("tempoValue").textContent = this.value;
+  });
   
   function noteToMidi(note) {
     const map = { C:0, "C#":1, Db:1, D:2, "D#":3, Eb:3, E:4, F:5, "F#":6, Gb:6, G:7, "G#":8, Ab:8, A:9, "A#":10, Bb:10, B:11 };
