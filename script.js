@@ -1,11 +1,8 @@
 window.addEventListener("DOMContentLoaded", () => {
   
   const divisions = ["4", "8"];
-  function durationBeats(dur){
-     return 4 / dur;
-  };
+  function durationBeats(dur){return 4 / dur};
   const beatsPerMeasure = 4;
-
   const SCALE_NOTES = {
     "C":  ["C", "D", "E", "F", "G", "A", "B"],
     "G":  ["G", "A", "B", "C", "D", "E", "F#"],
@@ -22,31 +19,38 @@ window.addEventListener("DOMContentLoaded", () => {
     "Chromatic": ["C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "B"]
   };
 
-  document.getElementById("numMeasures").addEventListener("input", function () {
+
+
+  
+  document.getElementById("numMeasures").addEventListener("input", function () {        //get how many measures to generate
     document.getElementById("measureValue").textContent = this.value;
   });
 
-  document.getElementById("octaveRange").addEventListener("input", function () {
+  document.getElementById("octaveRange").addEventListener("input", function () {        //get octave range
     document.getElementById("octaveRangeValue").textContent = this.value;
   });
 
-  document.getElementById("centerOctave").addEventListener("input", function () {
+  document.getElementById("centerOctave").addEventListener("input", function () {        //get center of range
     document.getElementById("centerOctaveValue").textContent = this.value;
   });
 
+
+  
   function noteToMidi(note) {
     const map = { C:0, "C#":1, Db:1, D:2, "D#":3, Eb:3, E:4, F:5, "F#":6, Gb:6, G:7, "G#":8, Ab:8, A:9, "A#":10, Bb:10, B:11 };
     return map[note];
   }
 
-  function renderABC(notes, key, numMeasures) {
+
+  
+  function notesToABC(notes, key, numMeasures) {
     const abcL = 8
     const header = `X:1\nT:ts etude pmo\nM:4/4\nK:${key === "Chromatic" ? "C" : key}\nL:1/`+ abcL +`\n`;
 
     const abcNotes = [];
     let measureBeat = 0;
 
-    for (let n of notes) {
+    for (let n of notes) {                                                             // this for loop needs some work for generalization and readability
       const dur = n.division === "4" ? 1 : 0.5;
       let abcDur = n.division / 4 === 1 ? "" : ""; // L:1/8, so "4" is 2, "8" is 1
       if (dur === 1) abcDur = "2";
@@ -61,18 +65,11 @@ window.addEventListener("DOMContentLoaded", () => {
     }
 
     const abcString = header + abcNotes.join(" ") + " |]";
-    ABCJS.renderAbc("paper", abcString, {}, {});
-
-    document.getElementById("rawNotation").innerHTML = abcString;
-
-    // Add synth playback
-    ABCJS.renderMidi("abcControls", abcString, {
-      generateDownload: true,
-      inlineControls: true,
-      responsive: "resize"
-    });
+    return abcString
   }
 
+
+  
   function abcjsPitch(note) {
     const [letter, octaveStr] = note.match(/[A-Ga-g#b]+|\d+/g);
     const octave = parseInt(octaveStr);
@@ -123,7 +120,7 @@ window.addEventListener("DOMContentLoaded", () => {
       let beatValue = durationBeats(dur);
 
       if (currentBeats + beatValue > totalBeats) {
-        beatValue = totalBeats - currentBeats;      // maybe continue would work?
+        beatValue = totalBeats - currentBeats;      // maybe continue would also work?
       }
 
       const interval = doJumps ? Math.floor(Math.random() * 15) - 7 : (Math.random() < 0.5 ? 1 : -1);
@@ -146,7 +143,42 @@ window.addEventListener("DOMContentLoaded", () => {
     }
 
     console.log("Generated key and notes:<br>" + JSON.stringify(key) + "<br>" + JSON.stringify(notes));
-    renderABC(notes, key, numMeasures);
+
+    const convertedABC = notesToABC(notes, key, numMeasures)
+    document.getElementById("rawNotation").innerHTML = convertedABC;    
+    //ABCJS.renderAbc("paper", convertedABC, {}, {});
+
+    var visualOptions = {  };
+    var visualObj = ABCJS.renderAbc("paper", convertedABC, visualOptions);
+    
+    if (ABCJS.synth.supportsAudio()) {
+        var controlOptions = {
+            displayRestart: true,
+            displayPlay: true,
+            displayProgress: true
+        };
+        var synthControl = new ABCJS.synth.SynthController();
+        synthControl.load("#audio", null, controlOptions);
+        synthControl.disable(true);
+        var midiBuffer = new ABCJS.synth.CreateSynth();
+        midiBuffer.init({
+            visualObj: visualObj[0],
+            millisecondsPerMeasure: 800,
+            options: {
+                
+            }
+
+        }).then(function () {
+            synthControl.setTune(visualObj[0], true).then(function (response) {
+            document.querySelector(".abcjs-inline-audio").classList.remove("disabled");
+            })
+        });
+    } else {
+        console.log("audio is not supported on this browser");
+    };
+
+
+    
   });
   
 });
