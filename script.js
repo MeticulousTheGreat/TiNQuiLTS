@@ -155,7 +155,7 @@ window.addEventListener("DOMContentLoaded", () => {
         var controlOptions = {
             displayRestart: true,
             displayPlay: true,
-            displayProgress: true
+            displayLoop: true
         };
         var synthControl = new ABCJS.synth.SynthController();
         synthControl.load("#audio", null, controlOptions);
