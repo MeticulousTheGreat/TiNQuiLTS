@@ -165,7 +165,7 @@ window.addEventListener("DOMContentLoaded", () => {
   function prepAudio () {
     //ABCJS.midi.stopPlaying();
     const tempo = document.getElementById("tempoSlider").value;
-    convertedABC = `Q:1/4=` + tempo + notesToABC(notes, key, numMeasures)
+    convertedABC = `Q:1/4=` + tempo + `\n` + notesToABC(notes, key, numMeasures)
     document.getElementById("rawNotation").innerHTML = convertedABC;
     
     var visualOptions = { responsive: 'resize' };
