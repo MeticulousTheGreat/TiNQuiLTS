@@ -1,6 +1,6 @@
 window.addEventListener("DOMContentLoaded", () => {
 
-  const notes = []
+  let notes = []
   let key = "C"
   
   const divisions = ["4", "8"];
