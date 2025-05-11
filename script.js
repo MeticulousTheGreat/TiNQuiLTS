@@ -164,7 +164,8 @@ window.addEventListener("DOMContentLoaded", () => {
     
   function prepAudio () {
     const tempo = parseInt(document.getElementById("tempoSlider").value);
-          
+    let mPM = beatsPerMeasure * 60000 / tempo;
+    
     var visualOptions = { responsive: 'resize' };
     var visualObj = ABCJS.renderAbc("paper", convertedABC, visualOptions);
     
@@ -180,7 +181,7 @@ window.addEventListener("DOMContentLoaded", () => {
         var midiBuffer = new ABCJS.synth.CreateSynth();
         midiBuffer.init({
             visualObj: visualObj[0],
-            millisecondsPerMeasure: (beatsPerMeasure * 60000 / tempo),
+            millisecondsPerMeasure: mPM,
             options: {
                 
             }
