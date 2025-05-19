@@ -55,18 +55,36 @@ window.addEventListener("DOMContentLoaded", () => {
     const abcNotes = [];
     let measureBeat = 0;
 
-    for (let n of notes) {                                                             // this for loop needs some work for generalization and readability
-      const dur = n.division === "4" ? 1 : 0.5;
-      let abcDur = n.division / 4 === 1 ? "" : ""; // L:1/8, so "4" is 2, "8" is 1
-      if (dur === 1) abcDur = "2";
+    for (let n of notes) {
+      let durBeats = n.division === "4" ? 1 : 0.5;
+      let remainingInMeasure = beatsPerMeasure - measureBeat;
       const pitch = abcjsPitch(n.pitch);
-      abcNotes.push(pitch + abcDur);
-      measureBeat += dur;
-  
-      if (measureBeat >= beatsPerMeasure) {
+
+      // Handle overflow case
+      if (durBeats > remainingInMeasure) {
+        // Split note into tied parts
+        const firstDur = remainingInMeasure;
+        const secondDur = durBeats - remainingInMeasure;
+
+        abcNotes.push(pitch + abcDuration(firstDur) + "-");
         abcNotes.push("|");
-        measureBeat = 0;
+        abcNotes.push(pitch + abcDuration(secondDur));
+
+        measureBeat = secondDur;
+      } else {
+        // Note fits in current measure
+        abcNotes.push(pitch + abcDuration(durBeats));
+        measureBeat += durBeats;
+  
+        if (measureBeat === beatsPerMeasure) {
+          abcNotes.push("|");
+          measureBeat = 0;
+        }
       }
+    }
+
+    if (abcNotes[abcNotes.length - 1] !== "|") {
+      abcNotes.push("|");
     }
 
     const abcString = header + abcNotes.join(" ") + " |]";
