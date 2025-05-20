@@ -8,7 +8,7 @@ window.addEventListener("DOMContentLoaded", () => {
   const meterTop = 4;
   const meterBottom = 4;
   const abcL = 8;
-  const beatsPerMeasure =  meterTop * abcL / meterBottom;
+  const LPerMeasure =  meterTop * abcL / meterBottom;
   const SCALE_NOTES = {
     "C":  ["C", "D", "E", "F", "G", "A", "B"],
     "G":  ["G", "A", "B", "C", "D", "E", "F#"],
@@ -62,7 +62,7 @@ window.addEventListener("DOMContentLoaded", () => {
       let pitch = abcjsPitch(n.pitch);
 
       while (abcBeats > 0) {
-        const remaining = beatsPerMeasure - measureBeat;
+        const remaining = LPerMeasure - measureBeat;
 
         if (abcBeats > remaining) {
           // Split the note: first part fits this measure, second will spill over
@@ -76,7 +76,7 @@ window.addEventListener("DOMContentLoaded", () => {
           measureBeat += abcBeats;
           abcBeats = 0;
 
-          if (measureBeat === beatsPerMeasure) {
+          if (measureBeat === LPerMeasure) {
             abcNotes.push("|");
             measureBeat = 0;
           }
@@ -134,7 +134,7 @@ window.addEventListener("DOMContentLoaded", () => {
     const octaveRange = parseInt(document.getElementById("octaveRange").value);
     const centerOctave = parseInt(document.getElementById("centerOctave").value);
 
-    const totalBeats = numMeasures * beatsPerMeasure;
+    const totalBeats = numMeasures * meterTop;
     key = selectedKeys.length ? selectedKeys[Math.floor(Math.random() * selectedKeys.length)] : "C";
     const scale = SCALE_NOTES[key];
 
