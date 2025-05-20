@@ -7,6 +7,8 @@ window.addEventListener("DOMContentLoaded", () => {
   function durationBeats(dur){return 4 / dur};
   const meterTop = 4;
   const meterBottom = 4;
+  const abcL = 8;
+  const beatsPerMeasure =  meterTop * abcL / meterBottom;
   const SCALE_NOTES = {
     "C":  ["C", "D", "E", "F", "G", "A", "B"],
     "G":  ["G", "A", "B", "C", "D", "E", "F#"],
@@ -50,8 +52,6 @@ window.addEventListener("DOMContentLoaded", () => {
 
   
   function notesToABC(notes, key, numMeasures) {
-    const abcL = 8
-    const beatsPerMeasure =  meterTop * abcL / meterBottom
     const header = `X:1\nT:ts etude pmo\nM:`+ meterTop +`/`+ meterBottom +`\nK:${key === "Chromatic" ? "C" : key}\nL:1/`+ abcL +`\n`;
 
     const abcNotes = [];
