@@ -151,7 +151,7 @@ window.addEventListener("DOMContentLoaded", () => {
 
     
     while (currentBeats < totalBeats) {
-      const div = useRhythms ? divisions[Math.floor(Math.random() * divisions.length)] : "4";
+      let div = useRhythms ? divisions[Math.floor(Math.random() * divisions.length)] : "4";
       let beatValue = divToDur(div);
 
       if (currentBeats + beatValue > totalBeats) {
