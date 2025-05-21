@@ -193,8 +193,7 @@ window.addEventListener("DOMContentLoaded", () => {
   function prepAudio () {
     //ABCJS.midi.stopPlaying();
     const tempo = document.getElementById("tempoSlider").value;
-    Tone.Transport.bpm.value = tempo;
-    convertedABC = `Q:1/4=` + tempo + `\n` + notesToABC(notes, key, numMeasures)
+    convertedABC = `Q:1/4=${tempo} \n` + notesToABC(notes, key, numMeasures)
     document.getElementById("rawNotation").innerHTML = convertedABC;
     
     var visualOptions = { responsive: 'resize' };
@@ -206,7 +205,7 @@ window.addEventListener("DOMContentLoaded", () => {
             displayPlay: true,
             displayLoop: true
         };
-        var synthControl = new ABCJS.synth.SynthController();
+        var synthControl = new ABCJS.synth.SynthControl();
         synthControl.load("#audio", null, controlOptions);
         synthControl.disable(true);
         var midiBuffer = new ABCJS.synth.CreateSynth();
