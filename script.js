@@ -155,9 +155,9 @@ window.addEventListener("DOMContentLoaded", () => {
 
       if (currentBeats + beatValue > totalBeats) {
         let beatValue = totalBeats - currentBeats;
+        console.log(beatValue);
       }
 
-      console.log(beatValue);
       
       const interval = doJumps ? Math.floor(Math.random() * 15) - 7 : (Math.random() < 0.5 ? 1 : -1);
       let newIndex = (scale.indexOf(noteObj.note) + interval + scale.length) % scale.length;
