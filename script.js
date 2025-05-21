@@ -4,7 +4,7 @@ window.addEventListener("DOMContentLoaded", () => {
   let key = "C"
   
   const divisions = ["4", "8"];
-  function durationBeats(dur){return 4 / dur};
+  function durationBeats(div){return 4 / div};
   const meterTop = 4;
   const meterBottom = 4;
   const abcL = 8;
@@ -150,11 +150,11 @@ window.addEventListener("DOMContentLoaded", () => {
 
     
     while (currentBeats < totalBeats) {
-      const dur = useRhythms ? divisions[Math.floor(Math.random() * divisions.length)] : "4";
-      let beatValue = durationBeats(dur);
+      const div = useRhythms ? divisions[Math.floor(Math.random() * divisions.length)] : "4";
+      let beatValue = durationBeats(div);
 
       if (currentBeats + beatValue > totalBeats) {
-        beatValue = totalBeats - currentBeats;      // maybe continue would also work?
+        beatValue = totalBeats - currentBeats;
       }
 
       const interval = doJumps ? Math.floor(Math.random() * 15) - 7 : (Math.random() < 0.5 ? 1 : -1);
@@ -171,7 +171,7 @@ window.addEventListener("DOMContentLoaded", () => {
         candidate = { note: scale[newIndex], octave: newOctave };
       }
 
-      notes.push({ pitch: candidate.note + candidate.octave, division: dur });
+      notes.push({ pitch: candidate.note + candidate.octave, division: div });
       noteObj = candidate;
       currentBeats += beatValue;
     }
