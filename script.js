@@ -212,7 +212,7 @@ window.addEventListener("DOMContentLoaded", () => {
         midiBuffer.init({
             visualObj: visualObj[0],
             options: {
-                
+                qpm: tempo
             }
 
         }).then(function () {
