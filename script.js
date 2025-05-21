@@ -205,8 +205,8 @@ window.addEventListener("DOMContentLoaded", () => {
             displayPlay: true,
             displayLoop: true
         };
-        var synthControl = new ABCJS.synth.SynthControl();
-        synthControl.load("#audio", null, controlOptions);
+        var synthControl = new ABCJS.synth.SynthController();
+
         synthControl.disable(true);
         var midiBuffer = new ABCJS.synth.CreateSynth();
         midiBuffer.init({
@@ -219,7 +219,8 @@ window.addEventListener("DOMContentLoaded", () => {
             synthControl.setTune(visualObj[0], true).then(function (response) {
             document.querySelector(".abcjs-inline-audio").classList.remove("disabled");
             })
-        });
+        })
+        synthControl.load("#audio", null, controlOptions);
     } else {
         console.log("audio is not supported on this browser");
     };
