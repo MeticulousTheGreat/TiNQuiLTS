@@ -157,6 +157,8 @@ window.addEventListener("DOMContentLoaded", () => {
         let beatValue = totalBeats - currentBeats;
       }
 
+      console.log(beatValue);
+      
       const interval = doJumps ? Math.floor(Math.random() * 15) - 7 : (Math.random() < 0.5 ? 1 : -1);
       let newIndex = (scale.indexOf(noteObj.note) + interval + scale.length) % scale.length;
       let newOctave = noteObj.octave + Math.floor((scale.indexOf(noteObj.note) + interval) / scale.length);
