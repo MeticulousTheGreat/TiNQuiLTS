@@ -157,7 +157,7 @@ window.addEventListener("DOMContentLoaded", () => {
       if (currentBeats + beatValue > totalBeats) {
         let beatValue = totalBeats - currentBeats;
         console.log(beatValue);
-        let div = durToDiv(beatValue)
+        let div = durToDiv(beatValue);
       }
 
     
