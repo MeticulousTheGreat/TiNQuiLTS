@@ -5,7 +5,7 @@ window.addEventListener("DOMContentLoaded", () => {
   
   const divisions = ["4", "8"];
   function divToDur(div){return 4 / div};
-  function durToDiv(dur){return 4 * dur};
+  function durToDiv(dur){return 4 / dur};
   const meterTop = 4;
   const meterBottom = 4;
   const abcL = 8;
