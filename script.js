@@ -196,7 +196,7 @@ window.addEventListener("DOMContentLoaded", () => {
     convertedABC = `Q:1/4=${tempo} \n` + notesToABC(notes, key, numMeasures)
     document.getElementById("rawNotation").innerHTML = convertedABC;
     
-    var visualOptions = { responsive: 'resize' };
+    var visualOptions = { responsive: 'resize' qpm: tempo };
     var visualObj = ABCJS.renderAbc("paper", convertedABC, visualOptions);
     
     if (ABCJS.synth.supportsAudio()) {
