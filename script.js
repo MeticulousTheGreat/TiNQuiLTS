@@ -211,9 +211,7 @@ window.addEventListener("DOMContentLoaded", () => {
         var midiBuffer = new ABCJS.synth.CreateSynth();
         midiBuffer.init({
             visualObj: visualObj[0],
-            options: { qpm: tempo }
-
-        }).then(function () {
+            options: { defaultQpm: tempo }}).then(function () {
             synthControl.setTune(visualObj[0], true).then(function (response) {
             document.querySelector(".abcjs-inline-audio").classList.remove("disabled");
             })
