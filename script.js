@@ -193,7 +193,7 @@ window.addEventListener("DOMContentLoaded", () => {
   function prepAudio () {
     //ABCJS.midi.stopPlaying();
     const tempo = parseInt(document.getElementById("tempoSlider").value);
-    convertedABC = `Q:1/4=${tempo} \n` + notesToABC(notes, key, numMeasures)
+    convertedABC = /* `Q:1/4=${tempo} \n` + */ notesToABC(notes, key, numMeasures)
     document.getElementById("rawNotation").innerHTML = convertedABC;
 
     var audioParams = { qpm: tempo }; //this is really stupid but I think its the only way to get the tempo to work
@@ -216,7 +216,7 @@ window.addEventListener("DOMContentLoaded", () => {
             visualObj: visualObj[0],
             options: { defaultQpm: tempo }
           }).then(function () {
-            synthControl.setTune(visualObj[0], true, { chordsOff: true, qpm: tempo })
+            synthControl.setTune(visualObj[0], true)
         });
         
         
