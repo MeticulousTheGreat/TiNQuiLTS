@@ -196,7 +196,7 @@ window.addEventListener("DOMContentLoaded", () => {
     convertedABC = `Q:1/4=${tempo} \n` + notesToABC(notes, key, numMeasures)
     document.getElementById("rawNotation").innerHTML = convertedABC;
 
-    var audioParams = { qpm: tempo }; //this is really stupid but I think its the only way to get the tempo to work
+    var audioParams = { qpm: 90 }; //this is really stupid but I think its the only way to get the tempo to work
     
     var visualOptions = { responsive: 'resize' };
     var visualObj = ABCJS.renderAbc("paper", convertedABC, visualOptions);
