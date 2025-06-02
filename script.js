@@ -211,10 +211,10 @@ window.addEventListener("DOMContentLoaded", () => {
         var midiBuffer = new ABCJS.synth.CreateSynth();
         midiBuffer.init({
             visualObj: visualObj[0],
-            options: { defaultQpm: tempo }}).then(function () {
-            synthControl.setTune(visualObj[0], true).then(function (response) {
-            document.querySelector(".abcjs-inline-audio").classList.remove("disabled");
-            })
+            options: { defaultQpm: tempo }
+          }).then(function () {
+            midiBuffer.start()
+          })
         })
         synthControl.load("#audio", null, controlOptions);
     } else {
