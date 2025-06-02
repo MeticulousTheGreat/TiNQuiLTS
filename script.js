@@ -215,10 +215,9 @@ window.addEventListener("DOMContentLoaded", () => {
         midiBuffer.init({
             visualObj: visualObj[0],
             options: { defaultQpm: tempo }
-                  }).then(function () {
-            synthControl.setTune(visualObj[0], true, audioParams)}).then(function (response) {
-            document.querySelector(".abcjs-inline-audio").classList.remove("disabled");
-            })
+          }).then(function () {
+            synthControl.setTune(visualObj[0], true, { chordsOff: true, qpm: tempo })
+        });
         
         
         synthControl.load("#audio", null, controlOptions);
