@@ -216,7 +216,7 @@ window.addEventListener("DOMContentLoaded", () => {
             options: { defaultQpm: tempo }
                   }).then(function () {
             synthControl.setTune(visualObj[0], true, audioParams).then(function (response) {
-            document.querySelector(".abcjs-inline-audio").classList.remove("disabled");More actions
+            document.querySelector(".abcjs-inline-audio").classList.remove("disabled");
             })
         })
         
