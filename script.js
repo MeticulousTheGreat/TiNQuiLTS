@@ -211,9 +211,7 @@ window.addEventListener("DOMContentLoaded", () => {
         var midiBuffer = new ABCJS.synth.CreateSynth();
         midiBuffer.init({
             visualObj: visualObj[0],
-            options: {
-                qpm: tempo
-            }
+            options: { qpm: tempo }
 
         }).then(function () {
             synthControl.setTune(visualObj[0], true).then(function (response) {
