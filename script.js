@@ -215,7 +215,7 @@ window.addEventListener("DOMContentLoaded", () => {
           }).then(function () {
             midiBuffer.start()
           })
-        })
+        
         synthControl.load("#audio", null, controlOptions);
     } else {
         console.log("audio is not supported on this browser");
