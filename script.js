@@ -195,6 +195,8 @@ window.addEventListener("DOMContentLoaded", () => {
     const tempo = 120//document.getElementById("tempoSlider").value;
     convertedABC = `Q:1/4=${tempo} \n` + notesToABC(notes, key, numMeasures)
     document.getElementById("rawNotation").innerHTML = convertedABC;
+
+    var audioParams = { qpm: tempo }; //this is really stupid but I think its the only way to get the tempo to work
     
     var visualOptions = { responsive: 'resize' };
     var visualObj = ABCJS.renderAbc("paper", convertedABC, visualOptions);
@@ -212,9 +214,11 @@ window.addEventListener("DOMContentLoaded", () => {
         midiBuffer.init({
             visualObj: visualObj[0],
             options: { defaultQpm: tempo }
-          }).then(function () {
-            midiBuffer.start()
-          })
+                  }).then(function () {
+            synthControl.setTune(visualObj[0], true, audioParams).then(function (response) {
+            document.querySelector(".abcjs-inline-audio").classList.remove("disabled");More actions
+            })
+        })
         
         synthControl.load("#audio", null, controlOptions);
     } else {
