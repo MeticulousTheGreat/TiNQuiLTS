@@ -200,7 +200,7 @@ window.addEventListener("DOMContentLoaded", () => {
   
   function prepAudio () {
     if (currentSynth) {
-      //currentSynth.Stop();
+      currentSynth.stop();
       currentSynth = null;
     }
     
