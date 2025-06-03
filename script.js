@@ -218,8 +218,7 @@ window.addEventListener("DOMContentLoaded", () => {
             visualObj: visualObj[0],
             options: { defaultQpm: tempo }
           }).then(async function () {
-            await midiBuffer.loadSoundFont();
-            synthControl.setTune(visualObj[0], true)
+            await synthControl.setTune(visualObj[0], true)
         });
       }
 
