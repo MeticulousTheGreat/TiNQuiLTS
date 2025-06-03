@@ -195,20 +195,25 @@ window.addEventListener("DOMContentLoaded", () => {
     convertedABC = `Q: 1/4=${tempo} \n` + notesToABC(notes, key, numMeasures)
     document.getElementById("rawNotation").innerHTML = convertedABC;
   }
+
+  let currentSynth = null;
   
   function prepAudio () {
-    //var audioParams = { qpm: tempo }; //this is really stupid but I think its the only way to get the tempo to work
+    if (currentSynth) {
+      currentSynth.Stop();
+      currentSynth = null;
+    }
     
     var visualOptions = { responsive: 'resize' };
-    //var visualObj = ABCJS.renderAbc("paper", convertedABC, visualOptions);
+    
     
       if (ABCJS.synth && ABCJS.synth.CreateSynth) {
-              const synth = new ABCJS.synth.CreateSynth();
-          synth.init({ 
+              currentSynth = new ABCJS.synth.CreateSynth();
+          currentSynth.init({ 
               visualObj: ABCJS.renderAbc("paper", convertedABC)[0]
           }).then(() => {
-              synth.prime().then(() => {
-                  synth.start();
+              currentSynth.prime().then(() => {
+                  currentSynth.start();
               });
           });
       } else {
