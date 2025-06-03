@@ -200,7 +200,7 @@ window.addEventListener("DOMContentLoaded", () => {
     const tempo = parseInt(document.getElementById("tempoSlider").value);
     convertedABC = `Q: 1/4=${tempo} \n` + notesToABC(notes, key, numMeasures)
     document.getElementById("rawNotation").innerHTML = convertedABC;
-    currentSynth.init({visualObj: ABCJS.renderABC("paper", convertedABC)[0]});
+    currentSynth.init({visualObj: ABCJS.renderAbc("paper", convertedABC)[0]});
   }
 
   let currentSynth = null;
