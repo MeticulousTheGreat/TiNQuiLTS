@@ -53,7 +53,7 @@ window.addEventListener("DOMContentLoaded", () => {
 
   
   function notesToABC(notes, key, numMeasures) {
-    const header = `X:1\nT:ts etude pmo\nM:`+ meterTop +`/`+ meterBottom +`\nK:${key === "Chromatic" ? "C" : key}\nL:1/`+ abcL +`\n`;
+    const header = `X:1\nT:ts etude pmo\nM:`+ meterTop +`/`+ meterBottom + `Q: 1/4=${tempo}` + `\nK:${key === "Chromatic" ? "C" : key}\nL:1/`+ abcL +`\n`;
 
     const abcNotes = [];
     let measureBeat = 0;
