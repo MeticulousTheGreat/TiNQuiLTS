@@ -181,20 +181,21 @@ window.addEventListener("DOMContentLoaded", () => {
     }
 
     console.log("Generated key and notes:<br>" + JSON.stringify(key) + "<br>" + JSON.stringify(notes));
-    ABCJS.renderAbc("paper", notesToABC(notes, key, numMeasures))
+    prepVisual();
   });
 
   
   document.getElementById("prepBtn").addEventListener("click", () => {
-    prepAudio()
+    prepVisual();
+    prepAudio();
   });
     
-    
-  function prepAudio () {
+  function prepVisual () {
     const tempo = parseInt(document.getElementById("tempoSlider").value);
     convertedABC = `Q: 1/4=${tempo} \n` + notesToABC(notes, key, numMeasures)
     document.getElementById("rawNotation").innerHTML = convertedABC;
-
+  
+  function prepAudio () {
     //var audioParams = { qpm: tempo }; //this is really stupid but I think its the only way to get the tempo to work
     
     var visualOptions = { responsive: 'resize' };
