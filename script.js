@@ -192,7 +192,7 @@ window.addEventListener("DOMContentLoaded", () => {
     
   function prepAudio () {
     const tempo = parseInt(document.getElementById("tempoSlider").value);
-    convertedABC = `Q:1/4=${tempo} \n` + notesToABC(notes, key, numMeasures)
+    convertedABC = `Q: 1/4=${tempo} \n` + notesToABC(notes, key, numMeasures)
     document.getElementById("rawNotation").innerHTML = convertedABC;
 
     //var audioParams = { qpm: tempo }; //this is really stupid but I think its the only way to get the tempo to work
