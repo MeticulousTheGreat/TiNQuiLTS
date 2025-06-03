@@ -181,7 +181,7 @@ window.addEventListener("DOMContentLoaded", () => {
     }
 
     console.log("Generated key and notes:<br>" + JSON.stringify(key) + "<br>" + JSON.stringify(notes));
-    prepAudio()
+    ABCJS.renderAbc("paper", notesToABC(notes, key, numMeasures))
   });
 
   
@@ -203,7 +203,7 @@ window.addEventListener("DOMContentLoaded", () => {
       if (ABCJS.synth && ABCJS.synth.CreateSynth) {
               const synth = new ABCJS.synth.CreateSynth();
           synth.init({ 
-              visualObj: ABCJS.renderAbc("paper", convertedABC, visualOptions)[0]
+              visualObj: ABCJS.renderAbc("paper", convertedABC)[0]
           }).then(() => {
               synth.prime().then(() => {
                   synth.start();
