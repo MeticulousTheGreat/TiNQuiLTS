@@ -201,31 +201,18 @@ window.addEventListener("DOMContentLoaded", () => {
     var visualOptions = { responsive: 'resize' };
     var visualObj = ABCJS.renderAbc("paper", convertedABC, visualOptions);
     
-    if (ABCJS.synth.supportsAudio()) {
-        var controlOptions = {
-            displayRestart: true,
-            displayPlay: true,
-            displayLoop: true
-        };
-      
-        var synthControl = new ABCJS.synth.SynthController();
-        synthControl.disable(true);
-        synthControl.load("#audio", null, controlOptions);
-      
-        var midiBuffer = new ABCJS.synth.CreateSynth();
-      
-        midiBuffer.init({
-            visualObj: visualObj[0],
-            options: { defaultQpm: tempo }
-          }).then(async function () {
-            await synthControl.setTune(visualObj[0], true)
-        });
-      }
-
-      
-       else {
-        console.log("audio is not supported on this browser");
-    };
+      if (ABCJS.synth && ABCJS.synth.CreateSynth) {
+              const synth = new ABCJS.synth.CreateSynth();
+          synth.init({ 
+              visualObj: ABCJS.renderAbc("*", notation)[0]
+          }).then(() => {
+              synth.prime().then(() => {
+                  synth.start();
+              });
+          });
+      } else {
+          alert('Audio synthesis not available in this version of ABC.js');
+      };
   };
   
 });
