@@ -2,6 +2,7 @@ window.addEventListener("DOMContentLoaded", () => {
 
   let notes = []
   let key = "C"
+  let tempo = 60
   
   const divisions = ["4", "8"];
   function divToDur(div){return 4 / div};
@@ -197,7 +198,7 @@ window.addEventListener("DOMContentLoaded", () => {
     }
     currentSynth = new ABCJS.synth.CreateSynth();
     
-    const tempo = parseInt(document.getElementById("tempoSlider").value);
+    tempo = parseInt(document.getElementById("tempoSlider").value);
     convertedABC = notesToABC(notes, key, numMeasures)
     document.getElementById("rawNotation").innerHTML = convertedABC;
     currentSynth.init({visualObj: ABCJS.renderAbc("paper", convertedABC)[0]});
