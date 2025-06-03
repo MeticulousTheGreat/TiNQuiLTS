@@ -187,10 +187,16 @@ window.addEventListener("DOMContentLoaded", () => {
   
   document.getElementById("prepBtn").addEventListener("click", () => {
     prepVisual();
-    prepAudio();
+    playAudio();
   });
     
   function prepVisual () {
+    if (currentSynth) {
+      currentSynth.stop();
+      currentSynth = null;
+    }
+    currentSynth = new ABCJS.synth.CreateSynth();
+    
     const tempo = parseInt(document.getElementById("tempoSlider").value);
     convertedABC = `Q: 1/4=${tempo} \n` + notesToABC(notes, key, numMeasures)
     document.getElementById("rawNotation").innerHTML = convertedABC;
@@ -199,13 +205,10 @@ window.addEventListener("DOMContentLoaded", () => {
 
   let currentSynth = null;
   
-  function prepAudio () {
-    if (currentSynth) {
-      currentSynth.stop();
-      currentSynth = null;
-    }
+  function playAudio () {
+
     
-    var visualOptions = { responsive: 'resize' };
+    var visualOptions = { responsive: 'resize' };  //vestigial?
     
     
       if (ABCJS.synth && ABCJS.synth.CreateSynth) {
