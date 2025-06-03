@@ -210,18 +210,21 @@ window.addEventListener("DOMContentLoaded", () => {
       
         var synthControl = new ABCJS.synth.SynthController();
         synthControl.disable(true);
+        synthControl.load("#audio", null, controlOptions);
+      
         var midiBuffer = new ABCJS.synth.CreateSynth();
       
         midiBuffer.init({
             visualObj: visualObj[0],
             options: { defaultQpm: tempo }
-          }).then(function () {
+          }).then(async function () {
+            await midiBuffer.loadSoundFont();
             synthControl.setTune(visualObj[0], true)
         });
-        
-        
-        synthControl.load("#audio", null, controlOptions);
-    } else {
+      }
+
+      
+       else {
         console.log("audio is not supported on this browser");
     };
   };
